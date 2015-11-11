@@ -19,7 +19,23 @@ testHash =
       "Returns path as list"
       (assertEqual expected actual)
 
-testQueryString =
+-- QUERY
+testQueryKeyValues =
+  let
+    input =
+      "a=1&b=2"
+    actual =
+      Erl.parseQuery input
+    expected =
+      Dict.empty
+        |> Dict.insert "a" "1"
+        |> Dict.insert "b" "2"
+  in
+    test
+      "Returns the correct dict from a query string"
+      (assertEqual expected actual)
+
+testQueryComplete =
   let
     input =
       "users?a=1&b=2"
@@ -34,12 +50,14 @@ testQueryString =
       "Returns query string pairs"
       (assertEqual expected actual)
 
+
 tests : Test
 tests = 
   suite "A Test Suite" 
     [ 
       testHash,
-      testQueryString
+      testQueryKeyValues,
+      testQueryComplete
     ]
 
 main : Element

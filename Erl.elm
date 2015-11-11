@@ -29,14 +29,14 @@ hashList str =
 
 -- QUERY
 
-queryPart: String -> String
-queryPart str =
+-- "../foo?query=1" --> "query=1"
+extractQueryString: String -> String
+extractQueryString str =
   let
     parts = split "?" str
     maybeFirst = List.head (List.drop 1 parts)
   in
     Maybe.withDefault "" maybeFirst
-
 
 -- "a=1" --> ("a", "1")
 queryStringElementToTuple: String -> (String, String)
@@ -51,6 +51,7 @@ queryStringElementToTuple element =
   in
     (first splitted, second splitted)
 
+-- "a=1&b=2" --> [("a", "1"), ("b", "2")]
 queryTuples: String -> List (String, String)
 queryTuples queryString =
   let
@@ -59,13 +60,15 @@ queryTuples queryString =
   in
     List.map queryStringElementToTuple splitted
 
-query: String -> Dict.Dict String String
-query str =
-  let
-    queryString =
-      queryPart str
-  in
-    Dict.fromList (queryTuples queryString)
+parseQuery: String -> Dict.Dict String String
+parseQuery str =
+  Dict.fromList (queryTuples str)
+
+queryFromAll: String -> Dict.Dict String String
+queryFromAll all =
+  all
+    |> extractQueryString
+    |> parseQuery
 
 -- MAIN
 
@@ -74,5 +77,5 @@ parse str =
   {
     path = [],
     hash = (hashList str),
-    query = (query str)
+    query = (queryFromAll str)
   }
