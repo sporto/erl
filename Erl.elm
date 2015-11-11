@@ -11,21 +11,25 @@ type alias Url = {
 
 -- HASH
 
-hashPart: String -> String
-hashPart str =
+extractHash: String -> String
+extractHash str =
   let
     parts = split "#" str
     maybeFirst = List.head (List.drop 1 parts)
   in
     Maybe.withDefault "" maybeFirst
 
-hashList: String -> List String
-hashList str =
+parseHash: String -> List String
+parseHash str =
   let
-    list = split "/" (hashPart str)
+    list = split "/" str
     notEmpty = \x -> not (isEmpty x)
   in
     List.filter notEmpty list
+
+hashFromAll: String -> List String
+hashFromAll str =
+  parseHash (extractHash str)
 
 -- QUERY
 
@@ -76,6 +80,6 @@ parse: String -> Url
 parse str =
   {
     path = [],
-    hash = (hashList str),
+    hash = (hashFromAll str),
     query = (queryFromAll str)
   }

@@ -9,14 +9,38 @@ import ElmTest.Test exposing (test, Test, suite)
 import ElmTest.Assertion exposing (assert, assertEqual)
 import ElmTest.Runner.Element exposing (runDisplay)
 
-testHash =
+-- PROTOCOL
+
+-- PORT
+
+-- PATH
+
+-- HASH
+
+testParseHash =
   let
-    input    = "#/users/1"
-    actual   = (Erl.parse input).hash
-    expected = ["users", "1"]
+    input =
+      "/users/1/edit"
+    actual =
+      Erl.parseHash input
+    expected =
+      ["users", "1", "edit"]
   in
     test
-      "Returns path as list"
+      "Returns hash as list"
+      (assertEqual expected actual)
+
+testHashComplete =
+  let
+    input =
+      "#/users/1"
+    actual =
+      (Erl.parse input).hash
+    expected = 
+      ["users", "1"]
+  in
+    test
+      "Returns hash as list"
       (assertEqual expected actual)
 
 -- QUERY
@@ -55,7 +79,7 @@ tests : Test
 tests = 
   suite "A Test Suite" 
     [ 
-      testHash,
+      testHashComplete,
       testQueryKeyValues,
       testQueryComplete
     ]
