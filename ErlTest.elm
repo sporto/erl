@@ -1,37 +1,45 @@
 module ErlTest where
 
 import String
+import Dict
 import Graphics.Element exposing (Element)
-import Uri
+import Erl
 
 import ElmTest.Test exposing (test, Test, suite)
 import ElmTest.Assertion exposing (assert, assertEqual)
 import ElmTest.Runner.Element exposing (runDisplay)
 
---myTest = 
---  let
---    actual = Uri.parse "foo"
---    expected = Uri.Url ["foo"]
---  in
---    test
---      "Returns the correct thing"
---      (assertEqual actual expected)
-
 testHash =
   let
-    actual = Uri.parse "#/users/1"
-    expected = Uri.Url [] ["users", "1"] 
+    input    = "#/users/1"
+    actual   = (Erl.parse input).hash
+    expected = ["users", "1"]
   in
     test
       "Returns path as list"
+      (assertEqual expected actual)
+
+testQueryString =
+  let
+    input =
+      "users?a=1&b=2"
+    actual =
+      (Erl.parse input).query
+    expected = 
+      Dict.empty
+        |> Dict.insert "a" "1"
+        |> Dict.insert "b" "2"
+  in
+    test
+      "Returns query string pairs"
       (assertEqual expected actual)
 
 tests : Test
 tests = 
   suite "A Test Suite" 
     [ 
-      --myTest,
-      testHash
+      testHash,
+      testQueryString
     ]
 
 main : Element
