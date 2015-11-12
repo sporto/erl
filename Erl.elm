@@ -6,8 +6,8 @@ import Regex
 import Debug
 
 type alias Url = {
-  domain: List String,
-  hash: List String,
+  host: List String,
+  fragment: List String,
   password: String,
   path: List String,
   port': Int,
@@ -15,6 +15,12 @@ type alias Url = {
   query: Dict.Dict String String,
   username: String
 }
+
+-- UTILS
+
+notEmpty: String -> Bool
+notEmpty str = 
+  not (isEmpty str)
 
 -- PROTOCOL
 
@@ -46,29 +52,47 @@ extractPort str =
       |> Maybe.withDefault ""
       |> toInt
       |> Result.toMaybe
-      |> Maybe.withDefault 0
+      |> Maybe.withDefault 80
 
--- HASH
+-- PATH
 
-extractHash: String -> String
-extractHash str =
+extractPath: String -> String
+extractPath str =
+  ""
+
+parsePath: String -> List String
+parsePath str =
+  let
+    parts =
+      split "/" str
+  in
+    List.filter notEmpty parts
+
+pathFromAll: String -> List String
+pathFromAll str =
+  parsePath (extractPath str)
+
+-- FRAGMENT
+
+extractFragment: String -> String
+extractFragment str =
   let
     parts = split "#" str
     maybeFirst = List.head (List.drop 1 parts)
   in
     Maybe.withDefault "" maybeFirst
 
-parseHash: String -> List String
-parseHash str =
+parseFragment: String -> List String
+parseFragment str =
   let
-    list = split "/" str
-    notEmpty = \x -> not (isEmpty x)
+    parts = 
+      split "/" str
   in
-    List.filter notEmpty list
+    List.filter notEmpty parts
 
-hashFromAll: String -> List String
-hashFromAll str =
-  parseHash (extractHash str)
+fragmentFromAll: String -> List String
+fragmentFromAll str =
+  parseFragment (extractFragment str)
 
 -- QUERY
 
@@ -118,10 +142,10 @@ queryFromAll all =
 parse: String -> Url
 parse str =
   {
-    domain = [],
-    hash = (hashFromAll str),
+    host = [],
+    fragment = (fragmentFromAll str),
     password = "",
-    path = [],
+    path = (pathFromAll str),
     port' = (extractPort str),
     protocol = "",
     query = (queryFromAll str),

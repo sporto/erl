@@ -57,8 +57,8 @@ testPortExtract =
         ("http://example.com:3000", 3000),
         ("http://example.com:3000/", 3000),
         ("http://example.com:3000/users", 3000),
-        ("http://example.com", 0),
-        ("http://example.com/users", 0)
+        ("http://example.com", 80),
+        ("http://example.com/users", 80)
       ]
     run (input, expected) =
       test "Extracts the port"
@@ -88,14 +88,44 @@ testPortComplete =
 
 -- PATH
 
--- HASH
+testPathParse: Test
+testPathParse =
+  let
+    inputs =
+      [
+        ("/users/index.html", ["users", "index.html"]),
+        ("/users/1/edit", ["users", "1", "edit"])
+      ]
+    run (input, expected) =
+      test "Parses the path"
+        (assertEqual expected (Erl.parsePath input))
+  in
+    suite "Path"
+      (List.map run inputs)
 
-testHashParse =
+testPathComplete: Test
+testPathComplete =
+  let
+    inputs =
+      [
+        ("http://foo.com/users/index.html?a=1", ["users", "index.html"]),
+        ("/users/1/edit", ["users", "1", "edit"])
+      ]
+    run (input, expected) =
+      test "Parses the path"
+        (assertEqual expected (Erl.parse input).path)
+  in
+    suite "Path"
+      (List.map run inputs)
+
+-- FRAGMENT
+
+testFragmentParse =
   let
     input =
       "/users/1/edit"
     actual =
-      Erl.parseHash input
+      Erl.parseFragment input
     expected =
       ["users", "1", "edit"]
   in
@@ -103,12 +133,12 @@ testHashParse =
       "Returns hash as list"
       (assertEqual expected actual)
 
-testHashComplete =
+testFragmentComplete =
   let
     input =
       "#/users/1"
     actual =
-      (Erl.parse input).hash
+      (Erl.parse input).fragment
     expected = 
       ["users", "1"]
   in
@@ -149,31 +179,22 @@ testQueryComplete =
       (assertEqual expected actual)
 
 -- suite : String -> List Test -> Test
-individualTests: Test
-individualTests = 
-  suite "Individual Tests"
+tests: Test
+tests = 
+  suite "Tests"
     [ 
-      testHashComplete,
-      testHashParse,
+      testFragmentComplete,
+      testFragmentParse,
+      testPathParse,
+      testPathComplete,
+      testPortComplete,
+      testPortExtract,
       testProtocolExtract,
       testProtocolExtractWhenMissing,
       testQueryComplete,
       testQueryKeyValues
     ]
 
-testSuites: List Test
-testSuites =
-  [
-    individualTests,
-    testPortExtract,
-    testPortComplete
-  ]
-
-testSuite: Test
-testSuite =
-  suite "All test"
-    testSuites
-
 main : Element
 main = 
-    runDisplay testSuite
+    runDisplay tests
