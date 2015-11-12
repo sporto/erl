@@ -9,19 +9,40 @@ import ElmTest.Test exposing (test, Test, suite)
 import ElmTest.Assertion exposing (assert, assertEqual)
 import ElmTest.Runner.Element exposing (runDisplay)
 
+-- UTILS
+
+testRightFrom =
+  let
+    inputs =
+      [
+        ("", "#", ""),
+        ("aa#bb", "#", "bb"),
+        ("aa#bb#cc", "#", "cc"),
+        ("aa", "#", ""),
+        ("#bb", "#", "bb"),
+        ("aa#", "#", "")
+      ]
+    run (input, delimiter, expected) =
+      test "Parses the path"
+        (assertEqual expected (Erl.rightFrom delimiter input))
+  in
+    suite "rightFrom"
+      (List.map run inputs)
+
 -- PROTOCOL
 
 testProtocolComplete =
   let
-    input =
-      "http://example.com:3000"
-    actual =
-      (Erl.parse input).protocol
-    expected =
-      "http"
+    inputs =
+      [
+        ("http://example.com:3000", "http")
+      ]
+    run (input, expected) =
+      test "Protocol"
+        (assertEqual expected (Erl.parse input).protocol)
   in
-    test "Extracts the protocol"
-      (assertEqual expected actual)
+    suite "Protocol"
+      (List.map run inputs)
 
 testProtocolExtract =
   let
@@ -86,7 +107,64 @@ testPortComplete =
 
 -- PASSWORD
 
+-- HOST
+
+testHostExtract: Test
+testHostExtract =
+  let
+    inputs =
+      [
+        ("http://foo.com", "foo.com"),
+        ("http://api.foo.com", "api.foo.com"),
+        ("http://api.foo.com/", "api.foo.com"),
+        ("http://api.foo.com/users", "api.foo.com"),
+        ("foo.com", "foo.com"),
+        ("foo.com/users", "foo.com"),
+        ("api.foo.com", "api.foo.com"),
+        ("users/1/edit", ""),
+        ("users/index.html", "")
+      ]
+    run (input, expected) =
+      test ("Extracts host " ++ input)
+        (assertEqual expected (Erl.extractHost input))
+  in
+    suite "Extract host"
+      (List.map run inputs)
+
+testHostComplete: Test
+testHostComplete =
+  let
+    inputs =
+      [
+        ("http://www.foo.com/users" , "www.foo.com")
+      ]
+    run (input, expected) =
+      test ("Parses host in " ++ input)
+        (assertEqual expected (Erl.parse input).host)
+  in
+    suite "Parses host"
+      (List.map run inputs)
+
 -- PATH
+
+testPathExtract: Test
+testPathExtract =
+  let
+    inputs =
+      [
+        ("http://foo.com/users/index.html", "/users/index.html"),
+        ("foo.com/users/index.html", "/users/index.html"),
+        ("/users/index.html", "/users/index.html"),
+        ("users/index.html", "users/index.html"),
+        ("users/index.html#xyz", "users/index.html"),
+        ("users/index.html?a=1", "users/index.html")
+      ]
+    run (input, expected) =
+      test ("Extracts path " ++ input)
+        (assertEqual expected (Erl.extractPath input))
+  in
+    suite "Extract path"
+      (List.map run inputs)
 
 testPathParse: Test
 testPathParse =
@@ -185,14 +263,18 @@ tests =
     [ 
       testFragmentComplete,
       testFragmentParse,
-      testPathParse,
+      testHostExtract,
+      testHostComplete,
       testPathComplete,
+      testPathExtract,
+      testPathParse,
       testPortComplete,
       testPortExtract,
       testProtocolExtract,
       testProtocolExtractWhenMissing,
       testQueryComplete,
-      testQueryKeyValues
+      testQueryKeyValues,
+      testRightFrom
     ]
 
 main : Element

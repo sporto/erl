@@ -6,7 +6,7 @@ import Regex
 import Debug
 
 type alias Url = {
-  host: List String,
+  host: String,
   fragment: List String,
   password: String,
   path: List String,
@@ -22,6 +22,66 @@ notEmpty: String -> Bool
 notEmpty str = 
   not (isEmpty str)
 
+-- "aa#bb" --> "bb"
+rightFrom: String -> String -> String
+rightFrom delimiter str =
+  let
+    parts =
+      split delimiter str
+  in
+    case List.length parts of
+      0 ->
+        ""
+      1 ->
+        ""
+      _ ->
+        parts
+          |> List.reverse
+          |> List.head
+          |> Maybe.withDefault ""
+
+rightFromOrSame: String -> String -> String
+rightFromOrSame delimiter str =
+  let
+    parts =
+      split delimiter str
+  in
+    parts
+      |> List.reverse
+      |> List.head
+      |> Maybe.withDefault ""
+
+
+  --let
+  --  ixs =
+  --    indexes delimiter str
+  --in
+  --  case ixs of
+  --    [] ->
+  --      ""
+  --    _ ->
+  --      ""
+
+  --let
+  --  rx =
+  --    Regex.regex ("(?<=\#).+")
+  --in
+  --  str
+  --    |> Regex.find (Regex.AtMost 1) rx
+  --    |> List.map .match
+  --    |> List.head
+  --    |> Maybe.withDefault ""
+
+leftFrom: String -> String -> String
+leftFrom delimiter str =
+  let
+    parts =
+      split delimiter str
+  in
+    parts
+      |> List.head
+      |> Maybe.withDefault ""
+
 -- PROTOCOL
 
 extractProtocol: String -> String
@@ -35,6 +95,18 @@ extractProtocol str =
         ""
       _ ->
         Maybe.withDefault "" (List.head parts)
+
+-- HOST
+
+extractHost: String -> String
+extractHost str =
+  str
+    |> rightFromOrSame "://"
+    |> leftFrom "/"
+    |> Regex.find (Regex.AtMost 1) (Regex.regex "(\\w+\\.)+\\w+")
+    |> List.map .match
+    |> List.head
+    |> Maybe.withDefault ""
 
 -- PORT
 
@@ -58,7 +130,15 @@ extractPort str =
 
 extractPath: String -> String
 extractPath str =
-  ""
+  let
+    host =
+      extractHost str
+  in
+    str
+      |> rightFromOrSame "://"
+      |> leftFrom "?"
+      |> leftFrom "#"
+      |> Regex.replace Regex.All (Regex.regex host) (\_ -> "")
 
 parsePath: String -> List String
 parsePath str =
@@ -142,7 +222,7 @@ queryFromAll all =
 parse: String -> Url
 parse str =
   {
-    host = [],
+    host = (extractHost str),
     fragment = (fragmentFromAll str),
     password = "",
     path = (pathFromAll str),
