@@ -40,7 +40,6 @@ Open `http://localhost:8000/ErlTest.elm`
 
 ## Todo
 
-- Protocol
 - Username
 - Password
 - Port

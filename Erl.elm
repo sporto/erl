@@ -2,13 +2,15 @@ module Erl where
 
 import Dict
 import String exposing (..)
+import Regex
+import Debug
 
 type alias Url = {
   domain: List String,
   hash: List String,
   password: String,
   path: List String,
-  port': Int,
+  port': String,
   protocol: String,
   query: Dict.Dict String String,
   username: String
@@ -28,6 +30,26 @@ extractProtocol str =
       _ ->
         Maybe.withDefault "" (List.head parts)
 
+-- PORT
+
+extractPort: String -> String
+extractPort str =
+  let
+    rx =
+      Regex.regex "(?:)\\d+"
+    res =
+      Regex.find (Regex.AtMost 1) rx str
+  in
+    res
+      |> List.map .match
+      |> List.head
+      |> Maybe.withDefault ""
+
+{--
+      |> toInt
+      |> Result.toMaybe
+      |> Maybe.withDefault 0
+--}
 -- HASH
 
 extractHash: String -> String
@@ -102,7 +124,7 @@ parse str =
     hash = (hashFromAll str),
     password = "",
     path = [],
-    port' = 0,
+    port' = "",
     protocol = "",
     query = (queryFromAll str),
     username = ""

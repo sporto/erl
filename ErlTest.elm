@@ -44,10 +44,27 @@ testProtocolExtractWhenMissing =
     expected =
       ""
   in
-    test "Returnes empty when protocol is missing"
+    test "Returns empty when protocol is missing"
       (assertEqual expected actual)
 
 -- PORT
+
+testPortExtract =
+  let
+    inputs =
+      [
+        ("http://example.com:3000", "3000")
+      ]
+    run (input, expected) =
+      test "Extracts the port"
+        (assertEqual expected (Erl.extractPort input))
+  in
+    List.map run inputs
+
+
+-- USERNAME
+
+-- PASSWORD
 
 -- PATH
 
@@ -95,6 +112,7 @@ testQueryKeyValues =
       "Returns the correct dict from a query string"
       (assertEqual expected actual)
 
+testQueryComplete: Test
 testQueryComplete =
   let
     input =
@@ -111,18 +129,30 @@ testQueryComplete =
       (assertEqual expected actual)
 
 
-tests : Test
-tests = 
-  suite "A Test Suite" 
-    [ 
-      testProtocolExtract,
-      testProtocolExtractWhenMissing,
-      testHashComplete,
-      testHashParse,
-      testQueryComplete,
-      testQueryKeyValues
-    ]
+individualTests : List Test
+individualTests = 
+  [ 
+    testHashComplete,
+    testHashParse,
+    testProtocolExtract,
+    testProtocolExtractWhenMissing,
+    testQueryComplete,
+    testQueryKeyValues
+  ]
+
+groupedTests: List Test
+groupedTests =
+  testPortExtract
+
+allTest: Test
+allTest =
+  let
+    tests =
+      List.concat [individualTests, groupedTests]
+  in
+    suite "Elr"
+      tests
 
 main : Element
 main = 
-    runDisplay tests
+    runDisplay allTest
