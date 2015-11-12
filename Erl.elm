@@ -10,7 +10,7 @@ type alias Url = {
   hash: List String,
   password: String,
   path: List String,
-  port': String,
+  port': Int,
   protocol: String,
   query: Dict.Dict String String,
   username: String
@@ -32,7 +32,7 @@ extractProtocol str =
 
 -- PORT
 
-extractPort: String -> String
+extractPort: String -> Int
 extractPort str =
   let
     rx =
@@ -44,12 +44,10 @@ extractPort str =
       |> List.map .match
       |> List.head
       |> Maybe.withDefault ""
-
-{--
       |> toInt
       |> Result.toMaybe
       |> Maybe.withDefault 0
---}
+
 -- HASH
 
 extractHash: String -> String
@@ -124,7 +122,7 @@ parse str =
     hash = (hashFromAll str),
     password = "",
     path = [],
-    port' = "",
+    port' = (extractPort str),
     protocol = "",
     query = (queryFromAll str),
     username = ""

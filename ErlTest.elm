@@ -49,17 +49,37 @@ testProtocolExtractWhenMissing =
 
 -- PORT
 
+testPortExtract: Test
 testPortExtract =
   let
     inputs =
       [
-        ("http://example.com:3000", "3000")
+        ("http://example.com:3000", 3000),
+        ("http://example.com:3000/", 3000),
+        ("http://example.com:3000/users", 3000),
+        ("http://example.com", 0),
+        ("http://example.com/users", 0)
       ]
     run (input, expected) =
       test "Extracts the port"
         (assertEqual expected (Erl.extractPort input))
   in
-    List.map run inputs
+    suite "Extract port"
+      (List.map run inputs)
+
+testPortComplete: Test
+testPortComplete =
+  let
+    inputs =
+      [
+        ("http://example.com:3000/users", 3000)
+      ]
+    run (input, expected) =
+      test "Extracts the port"
+        (assertEqual expected (Erl.parse input).port')
+  in
+    suite "Port"
+      (List.map run inputs)
 
 
 -- USERNAME
@@ -128,31 +148,32 @@ testQueryComplete =
       "Returns query string pairs"
       (assertEqual expected actual)
 
-
-individualTests : List Test
+-- suite : String -> List Test -> Test
+individualTests: Test
 individualTests = 
-  [ 
-    testHashComplete,
-    testHashParse,
-    testProtocolExtract,
-    testProtocolExtractWhenMissing,
-    testQueryComplete,
-    testQueryKeyValues
+  suite "Individual Tests"
+    [ 
+      testHashComplete,
+      testHashParse,
+      testProtocolExtract,
+      testProtocolExtractWhenMissing,
+      testQueryComplete,
+      testQueryKeyValues
+    ]
+
+testSuites: List Test
+testSuites =
+  [
+    individualTests,
+    testPortExtract,
+    testPortComplete
   ]
 
-groupedTests: List Test
-groupedTests =
-  testPortExtract
-
-allTest: Test
-allTest =
-  let
-    tests =
-      List.concat [individualTests, groupedTests]
-  in
-    suite "Elr"
-      tests
+testSuite: Test
+testSuite =
+  suite "All test"
+    testSuites
 
 main : Element
 main = 
-    runDisplay allTest
+    runDisplay testSuite
