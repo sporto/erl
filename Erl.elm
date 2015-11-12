@@ -4,10 +4,29 @@ import Dict
 import String exposing (..)
 
 type alias Url = {
-  path: List String,
+  domain: List String,
   hash: List String,
-  query: Dict.Dict String String
+  password: String,
+  path: List String,
+  port': Int,
+  protocol: String,
+  query: Dict.Dict String String,
+  username: String
 }
+
+-- PROTOCOL
+
+extractProtocol: String -> String
+extractProtocol str =
+  let
+    parts =
+      split "://" str
+  in
+    case List.length parts of
+      1 ->
+        ""
+      _ ->
+        Maybe.withDefault "" (List.head parts)
 
 -- HASH
 
@@ -79,7 +98,12 @@ queryFromAll all =
 parse: String -> Url
 parse str =
   {
-    path = [],
+    domain = [],
     hash = (hashFromAll str),
-    query = (queryFromAll str)
+    password = "",
+    path = [],
+    port' = 0,
+    protocol = "",
+    query = (queryFromAll str),
+    username = ""
   }
