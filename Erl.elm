@@ -241,7 +241,7 @@ parse str =
     password = "",
     path = (pathFromAll str),
     port' = (extractPort str),
-    protocol = "",
+    protocol = (extractProtocol str),
     query = (queryFromAll str),
     username = ""
   }

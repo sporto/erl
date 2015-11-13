@@ -45,15 +45,18 @@ testProtocolComplete =
 
 testProtocolExtract =
   let
-    input =
-      "http://example.com:3000"
-    actual =
-      Erl.extractProtocol input
-    expected =
-      "http"
+    inputs =
+      [
+        ("http://example.com:3000", "http"),
+        ("https://example.com:3000", "https"),
+        ("example.com:3000", "")
+      ]
+    run (input, expected) =
+      test "Protocol"
+        (assertEqual expected (Erl.extractProtocol input))
   in
-    test "Extracts the protocol"
-      (assertEqual expected actual)
+    suite "Extract protocol"
+      (List.map run inputs)
 
 testProtocolExtractWhenMissing =
   let
@@ -262,13 +265,14 @@ all =
     [ 
       testFragmentComplete,
       testFragmentParse,
-      testHostExtract,
       testHostComplete,
+      testHostExtract,
       testPathComplete,
       testPathExtract,
       testPathParse,
       testPortComplete,
       testPortExtract,
+      testProtocolComplete,
       testProtocolExtract,
       testProtocolExtractWhenMissing,
       testQueryComplete,

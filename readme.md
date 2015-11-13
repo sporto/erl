@@ -16,11 +16,11 @@ This will be parsed into an Elm record:
 {
   protocol: "http",
   username: "sam",
-  password: 'pass',
-  domain: ["api", "example", "com"],
+  password: "pass",
+  host: ["api", "example", "com"],
   port': 3000,
   path: ["products", "kids"],
-  hash: ["toys", "1"],
+  fragment: ["toys", "1"],
   query: Dict {
     "color": "red",
     "age": "10"
@@ -37,13 +37,8 @@ npm i
 npm test
 ```
 
-Open `http://localhost:8000/ErlTest.elm`
-
 ## Todo
 
 - Username
 - Password
-- Port
-- Domain
-- Path
 - Construction
