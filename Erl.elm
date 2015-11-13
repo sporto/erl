@@ -291,8 +291,34 @@ parse str =
     username = ""
   }
 
+-- TO STRING
+
+queryToString: Query -> String
+queryToString query =
+  let
+    tuples =
+      Dict.toList query
+    parts =
+      List.map (\(a, b) -> a ++ "=" ++ b) tuples
+  in
+    join "&" parts
+
 {-| Generate url string from an Erl.Url record
 -}
 toString: Url -> String
 toString url =
-  ""
+  let
+    protocol' =
+      url.protocol ++ "://"
+    host' =
+      join "." url.host
+    port' =
+      ":" ++ (Basics.toString url.port')
+    path' =
+      "/" ++ (join "/" url.path)
+    fragment' =
+      "#" ++ (join "/" url.fragment)
+    query' =
+      "?" ++ (queryToString url.query)
+  in
+    protocol' ++ host' ++ port' ++ path' ++ fragment' ++ query'

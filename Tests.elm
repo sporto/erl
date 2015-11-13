@@ -226,7 +226,7 @@ testToString =
       }
     inputs = 
       [
-        (url1, "http://www.foo.com:2000/users/1#a/b?q=1&k=2")
+        (url1, "http://www.foo.com:2000/users/1#a/b?k=2&q=1")
       ]
     run (input, expected) =
       test "Generates the url"

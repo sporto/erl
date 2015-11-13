@@ -4,6 +4,8 @@
 
 A URL parsing library for ELM
 
+[Documentation at package.elm-lang.org](http://package.elm-lang.org/packages/sporto/erl/latest)
+
 ## Parse
 
 Given a url like:
@@ -12,7 +14,7 @@ Given a url like:
 http://sam:pass@api.example.com:3000/products/kids#toys/1?color=red&age=10
 ```
 
-This will be parsed into an Elm record:
+This will be parsed this string into an Elm record:
 
 ```
 {
@@ -30,7 +32,6 @@ This will be parsed into an Elm record:
 }
 ```
 
-## Construct
 
 ## Test
 
