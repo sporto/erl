@@ -33,7 +33,8 @@ This will be parsed into an Elm record:
 ## Test
 
 ```
-elm reactor
+npm i
+npm test
 ```
 
 Open `http://localhost:8000/ErlTest.elm`

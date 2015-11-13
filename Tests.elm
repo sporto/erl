@@ -1,8 +1,7 @@
-module ErlTest where
+module Tests where
 
 import String
 import Dict
-import Graphics.Element exposing (Element)
 import Erl
 
 import ElmTest.Test exposing (test, Test, suite)
@@ -136,7 +135,7 @@ testHostComplete =
   let
     inputs =
       [
-        ("http://www.foo.com/users" , "www.foo.com")
+        ("http://www.foo.com/users" , ["www", "foo", "com"])
       ]
     run (input, expected) =
       test ("Parses host in " ++ input)
@@ -257,8 +256,8 @@ testQueryComplete =
       (assertEqual expected actual)
 
 -- suite : String -> List Test -> Test
-tests: Test
-tests = 
+all: Test
+all = 
   suite "Tests"
     [ 
       testFragmentComplete,
@@ -276,7 +275,3 @@ tests =
       testQueryKeyValues,
       testRightFrom
     ]
-
-main : Element
-main = 
-    runDisplay tests

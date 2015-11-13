@@ -5,8 +5,12 @@ import String exposing (..)
 import Regex
 import Debug
 
+-- TYPES
+
+type alias Host = List String
+
 type alias Url = {
-  host: String,
+  host: Host,
   fragment: List String,
   password: String,
   path: List String,
@@ -15,6 +19,7 @@ type alias Url = {
   query: Dict.Dict String String,
   username: String
 }
+
 
 -- UTILS
 
@@ -107,6 +112,15 @@ extractHost str =
     |> List.map .match
     |> List.head
     |> Maybe.withDefault ""
+
+parseHost: String -> Host
+parseHost str =
+  split "." str
+
+host: String -> Host
+host str =
+  parseHost (extractHost str)
+
 
 -- PORT
 
@@ -222,7 +236,7 @@ queryFromAll all =
 parse: String -> Url
 parse str =
   {
-    host = (extractHost str),
+    host = (host str),
     fragment = (fragmentFromAll str),
     password = "",
     path = (pathFromAll str),
