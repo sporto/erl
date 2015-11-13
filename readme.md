@@ -1,5 +1,7 @@
 # Erl
 
+[ ![Codeship Status for sporto/erl](https://codeship.com/projects/74c708d0-6c07-0133-ba44-0e105eb8924a/status?branch=master)](https://codeship.com/projects/115393)
+
 A URL parsing library for ELM
 
 ## Parse

@@ -5,7 +5,8 @@ module Erl (
   extractPort,
   extractProtocol, 
   extractQuery,
-  parse, 
+  parse,
+  toString,
   Url
   ) where
 
@@ -15,7 +16,7 @@ module Erl (
 @docs Url
 
 # Common Helpers
-@docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, extractQuery, parse
+@docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, extractQuery, parse, toString
 -}
 
 import Dict
@@ -26,18 +27,20 @@ import Debug
 -- TYPES
 
 type alias Host = List String
+type alias Fragment = List String
+type alias Query = Dict.Dict String String
 
 {-| Url record that holds url attributes
 
 -}
 type alias Url = {
   host: Host,
-  fragment: List String,
+  fragment: Fragment,
   password: String,
   path: List String,
   port': Int,
   protocol: String,
-  query: Dict.Dict String String,
+  query: Query,
   username: String
 }
 
@@ -271,8 +274,6 @@ queryFromAll all =
     |> extractQuery
     |> parseQuery
 
--- MAIN
-
 {-| Parse a Url an return a Erl.Url record
 
     parse "http://api.example.com/users/1#x/1?a=1" == Erl.Url{...}
@@ -289,3 +290,9 @@ parse str =
     query = (queryFromAll str),
     username = ""
   }
+
+{-| Generate url string from an Erl.Url record
+-}
+toString: Url -> String
+toString url =
+  ""

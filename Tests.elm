@@ -208,6 +208,33 @@ testQuery =
     suite "Query"
       (List.map run inputs)
 
+
+-- TO STRING
+
+testToString =
+  let
+    url1 =
+      {
+        protocol = "http",
+        host = ["www", "foo", "com"],
+        fragment = ["a", "b"],
+        password = "",
+        path = ["users", "1"],
+        port' = 2000,
+        query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2",
+        username = ""
+      }
+    inputs = 
+      [
+        (url1, "http://www.foo.com:2000/users/1#a/b?q=1&k=2")
+      ]
+    run (input, expected) =
+      test "Generates the url"
+        (assertEqual expected (Erl.toString input))
+  in
+    suite "toString"
+      (List.map run inputs)
+
 -- suite : String -> List Test -> Test
 all: Test
 all = 
@@ -224,5 +251,6 @@ all =
       testProtocol,
       testProtocolExtract,
       testQuery,
-      testQueryExtract
+      testQueryExtract,
+      testToString
     ]
