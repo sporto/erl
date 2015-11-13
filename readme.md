@@ -2,22 +2,18 @@
 
 [ ![Codeship Status for sporto/erl](https://codeship.com/projects/74c708d0-6c07-0133-ba44-0e105eb8924a/status?branch=master)](https://codeship.com/projects/115393)
 
-A URL parsing library for ELM
-
-[Documentation at package.elm-lang.org](http://package.elm-lang.org/packages/sporto/erl/latest/Erl)
+A URL parsing and construction library for ELM
 
 ## Parse
 
-Given a url like:
-
 ```elm
-url = http://sam:pass@api.example.com:3000/products/kids#toys/1?color=red&age=10
+-- Given a url string
+url = "http://sam:pass@api.example.com:3000/products/kids#toys/1?color=red&age=10"
 
 Erl.parse url 
-```
 
-Returns:
-```elm
+-- Returns a Erl.Url record:
+
 {
   protocol: "http",
   username: "sam",
@@ -33,6 +29,21 @@ Returns:
 }
 ```
 
+## toString
+
+```elm
+-- Given a Erl.Url record (url)
+
+Erl.toString url 
+
+-- Returns the url as string:
+
+"http://www.foo.com:2000/users/1#a/b?k=2&q=1"
+```
+
+## Documentation
+
+[Documentation at package.elm-lang.org](http://package.elm-lang.org/packages/sporto/erl/latest/Erl)
 
 ## Test
 
