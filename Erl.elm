@@ -1,4 +1,21 @@
-module Erl where
+module Erl (
+  extractFragment,
+  extractHost,
+  extractPath, 
+  extractPort,
+  extractProtocol, 
+  parse, 
+  Url
+  ) where
+
+{-| Library for parsing and constructing URLs
+
+# Definition
+@docs Url
+
+# Common Helpers
+@docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, parse
+-}
 
 import Dict
 import String exposing (..)
@@ -9,6 +26,9 @@ import Debug
 
 type alias Host = List String
 
+{-| Url record that holds url attributes
+
+-}
 type alias Url = {
   host: Host,
   fragment: List String,
@@ -89,6 +109,9 @@ leftFrom delimiter str =
 
 -- PROTOCOL
 
+{-| Extract the protocol from the url
+
+-}
 extractProtocol: String -> String
 extractProtocol str =
   let
@@ -103,6 +126,9 @@ extractProtocol str =
 
 -- HOST
 
+{-| Extract the host from the url
+
+-}
 extractHost: String -> String
 extractHost str =
   str
@@ -123,7 +149,9 @@ host str =
 
 
 -- PORT
+{-| Extract the port from the url
 
+-}
 extractPort: String -> Int
 extractPort str =
   let
@@ -142,6 +170,9 @@ extractPort str =
 
 -- PATH
 
+{-| Extract the path from the url
+
+-}
 extractPath: String -> String
 extractPath str =
   let
@@ -168,6 +199,9 @@ pathFromAll str =
 
 -- FRAGMENT
 
+{-| Extract the fragment (hash) from the url
+
+-}
 extractFragment: String -> String
 extractFragment str =
   let
@@ -233,6 +267,10 @@ queryFromAll all =
 
 -- MAIN
 
+{-| Parse a Url an return a Erl.Url record
+
+    parse "http://api.example.com/users/1#x/1?a=1" == Erl.Url{...}
+-}
 parse: String -> Url
 parse str =
   {

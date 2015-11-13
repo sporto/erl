@@ -8,29 +8,9 @@ import ElmTest.Test exposing (test, Test, suite)
 import ElmTest.Assertion exposing (assert, assertEqual)
 import ElmTest.Runner.Element exposing (runDisplay)
 
--- UTILS
-
-testRightFrom =
-  let
-    inputs =
-      [
-        ("", "#", ""),
-        ("aa#bb", "#", "bb"),
-        ("aa#bb#cc", "#", "cc"),
-        ("aa", "#", ""),
-        ("#bb", "#", "bb"),
-        ("aa#", "#", "")
-      ]
-    run (input, delimiter, expected) =
-      test "Parses the path"
-        (assertEqual expected (Erl.rightFrom delimiter input))
-  in
-    suite "rightFrom"
-      (List.map run inputs)
-
 -- PROTOCOL
 
-testProtocolComplete =
+testProtocol =
   let
     inputs =
       [
@@ -58,18 +38,6 @@ testProtocolExtract =
     suite "Extract protocol"
       (List.map run inputs)
 
-testProtocolExtractWhenMissing =
-  let
-    input =
-      "example.com:3000"
-    actual =
-      Erl.extractProtocol input
-    expected =
-      ""
-  in
-    test "Returns empty when protocol is missing"
-      (assertEqual expected actual)
-
 -- PORT
 
 testPortExtract: Test
@@ -90,8 +58,8 @@ testPortExtract =
     suite "Extract port"
       (List.map run inputs)
 
-testPortComplete: Test
-testPortComplete =
+testPort: Test
+testPort =
   let
     inputs =
       [
@@ -103,7 +71,6 @@ testPortComplete =
   in
     suite "Port"
       (List.map run inputs)
-
 
 -- USERNAME
 
@@ -133,8 +100,8 @@ testHostExtract =
     suite "Extract host"
       (List.map run inputs)
 
-testHostComplete: Test
-testHostComplete =
+testHost: Test
+testHost =
   let
     inputs =
       [
@@ -168,23 +135,8 @@ testPathExtract =
     suite "Extract path"
       (List.map run inputs)
 
-testPathParse: Test
-testPathParse =
-  let
-    inputs =
-      [
-        ("/users/index.html", ["users", "index.html"]),
-        ("/users/1/edit", ["users", "1", "edit"])
-      ]
-    run (input, expected) =
-      test "Parses the path"
-        (assertEqual expected (Erl.parsePath input))
-  in
-    suite "Path"
-      (List.map run inputs)
-
-testPathComplete: Test
-testPathComplete =
+testPath: Test
+testPath =
   let
     inputs =
       [
@@ -200,82 +152,62 @@ testPathComplete =
 
 -- FRAGMENT
 
-testFragmentParse =
+testFragmentExtract =
   let
-    input =
-      "/users/1/edit"
-    actual =
-      Erl.parseFragment input
-    expected =
-      ["users", "1", "edit"]
+    inputs =
+      [
+        ("#/users/1", "/users/1")
+      ]
+    run (input, expected) =
+      test "Extracts the fragment"
+        (assertEqual expected (Erl.extractFragment input))
   in
-    test
-      "Returns hash as list"
-      (assertEqual expected actual)
+    suite "Fragment"
+      (List.map run inputs)
 
-testFragmentComplete =
+testFragment =
   let
-    input =
-      "#/users/1"
-    actual =
-      (Erl.parse input).fragment
-    expected = 
-      ["users", "1"]
+    inputs =
+      [
+        ("#/users/1", ["users", "1"])
+      ]
+    run (input, expected) =
+      test "Parses the fragment"
+        (assertEqual expected (Erl.parse input).fragment)
   in
-    test
-      "Returns hash as list"
-      (assertEqual expected actual)
+    suite "Fragment"
+      (List.map run inputs)
 
 -- QUERY
-testQueryKeyValues =
-  let
-    input =
-      "a=1&b=2"
-    actual =
-      Erl.parseQuery input
-    expected =
-      Dict.empty
-        |> Dict.insert "a" "1"
-        |> Dict.insert "b" "2"
-  in
-    test
-      "Returns the correct dict from a query string"
-      (assertEqual expected actual)
 
-testQueryComplete: Test
-testQueryComplete =
+testQuery: Test
+testQuery =
   let
-    input =
-      "users?a=1&b=2"
-    actual =
-      (Erl.parse input).query
-    expected = 
-      Dict.empty
-        |> Dict.insert "a" "1"
-        |> Dict.insert "b" "2"
+    inputs = 
+      [
+        ("users?a=1&b=2", Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2")
+      ]
+    run (input, expected) =
+      test "Parses the query"
+        (assertEqual expected (Erl.parse input).query)
   in
-    test
-      "Returns query string pairs"
-      (assertEqual expected actual)
+    suite "Query"
+      (List.map run inputs)
 
 -- suite : String -> List Test -> Test
 all: Test
 all = 
   suite "Tests"
     [ 
-      testFragmentComplete,
-      testFragmentParse,
-      testHostComplete,
+      testFragment,
+      testFragmentExtract,
+      testHost,
       testHostExtract,
-      testPathComplete,
+      testPath,
       testPathExtract,
-      testPathParse,
-      testPortComplete,
+      testPort,
       testPortExtract,
-      testProtocolComplete,
+      testProtocol,
       testProtocolExtract,
-      testProtocolExtractWhenMissing,
-      testQueryComplete,
-      testQueryKeyValues,
-      testRightFrom
+      testQuery
     ]
