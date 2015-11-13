@@ -7,16 +7,24 @@ module Erl (
   extractQuery,
   parse,
   toString,
-  Url
+  Url,
+  Query
   ) where
 
 {-| Library for parsing and constructing URLs
 
-# Definition
-@docs Url
+# Types
+@docs Url, Query
 
-# Common Helpers
-@docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, extractQuery, parse, toString
+# Parse
+@docs parse
+
+# Parse helpers
+@docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, extractQuery
+
+# Construct
+@docs toString
+
 -}
 
 import Dict
@@ -26,26 +34,20 @@ import Debug
 
 -- TYPES
 
-type alias Protocol = String
-type alias Host = List String
-type alias Username = String
-type alias Password = String
-type alias Path = List String
-type alias Port = Int
-type alias Fragment = List String
+{-| Query: A Dict that holds keys and values for the query string
+-}
 type alias Query = Dict.Dict String String
 
-{-| Url record that holds url attributes
-
+{-| Url: record that holds url attributes
 -}
 type alias Url = {
-  protocol: Protocol,
-  username: Username,
-  password: Password,
-  host: Host,
-  port': Port,
-  path: Path,
-  fragment: Fragment,
+  protocol: String,
+  username: String,
+  password: String,
+  host: List String,
+  port': Int,
+  path: List String,
+  fragment: List String,
   query: Query
 }
 
@@ -148,11 +150,11 @@ extractHost str =
     |> List.head
     |> Maybe.withDefault ""
 
-parseHost: String -> Host
+parseHost: String -> List String
 parseHost str =
   split "." str
 
-host: String -> Host
+host: String -> List String
 host str =
   parseHost (extractHost str)
 
@@ -194,7 +196,7 @@ extractPath str =
       |> leftFrom "#"
       |> Regex.replace Regex.All (Regex.regex host) (\_ -> "")
 
-parsePath: String -> Path
+parsePath: String -> List String
 parsePath str =
   let
     parts =
@@ -202,7 +204,7 @@ parsePath str =
   in
     List.filter notEmpty parts
 
-pathFromAll: String -> Path
+pathFromAll: String -> List String
 pathFromAll str =
   parsePath (extractPath str)
 
@@ -222,7 +224,7 @@ extractFragment str =
     |> List.head
     |> Maybe.withDefault ""
 
-parseFragment: String -> Fragment
+parseFragment: String -> List String
 parseFragment str =
   let
     parts = 
@@ -230,7 +232,7 @@ parseFragment str =
   in
     List.filter notEmpty parts
 
-fragmentFromAll: String -> Fragment
+fragmentFromAll: String -> List String
 fragmentFromAll str =
   parseFragment (extractFragment str)
 
@@ -279,9 +281,9 @@ queryFromAll all =
     |> extractQuery
     |> parseQuery
 
-{-| Parse a Url an return a Erl.Url record
+{-| Parse a url string, returns an Erl.Url record
 
-    parse "http://api.example.com/users/1#x/1?a=1" == Erl.Url{...}
+    Erl.parse "http://api.example.com/users/1#x/1?a=1" == Erl.Url{...}
 -}
 parse: String -> Url
 parse str =
@@ -360,7 +362,7 @@ queryComponent url =
       query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
     }
 
-    Erl.toString url == http://www.foo.com:2000/users/1#a/b?k=2&q=1
+    Erl.toString url == "http://www.foo.com:2000/users/1#a/b?k=2&q=1"
 
 -}
 toString: Url -> String

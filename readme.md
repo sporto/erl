@@ -4,19 +4,20 @@
 
 A URL parsing library for ELM
 
-[Documentation at package.elm-lang.org](http://package.elm-lang.org/packages/sporto/erl/latest)
+[Documentation at package.elm-lang.org](http://package.elm-lang.org/packages/sporto/erl/latest/Erl)
 
 ## Parse
 
 Given a url like:
 
-```
-http://sam:pass@api.example.com:3000/products/kids#toys/1?color=red&age=10
+```elm
+url = http://sam:pass@api.example.com:3000/products/kids#toys/1?color=red&age=10
+
+Erl.parse url 
 ```
 
-This will be parsed this string into an Elm record:
-
-```
+Returns:
+```elm
 {
   protocol: "http",
   username: "sam",
