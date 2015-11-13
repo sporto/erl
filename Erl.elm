@@ -26,8 +26,12 @@ import Debug
 
 -- TYPES
 
+type alias Protocol = String
 type alias Host = List String
-type alias Port = String
+type alias Username = String
+type alias Password = String
+type alias Path = List String
+type alias Port = Int
 type alias Fragment = List String
 type alias Query = Dict.Dict String String
 
@@ -35,12 +39,12 @@ type alias Query = Dict.Dict String String
 
 -}
 type alias Url = {
-  protocol: String,
-  username: String,
-  password: String,
+  protocol: Protocol,
+  username: Username,
+  password: Password,
   host: Host,
-  port': Int,
-  path: List String,
+  port': Port,
+  path: Path,
   fragment: Fragment,
   query: Query
 }
@@ -190,7 +194,7 @@ extractPath str =
       |> leftFrom "#"
       |> Regex.replace Regex.All (Regex.regex host) (\_ -> "")
 
-parsePath: String -> List String
+parsePath: String -> Path
 parsePath str =
   let
     parts =
@@ -198,7 +202,7 @@ parsePath str =
   in
     List.filter notEmpty parts
 
-pathFromAll: String -> List String
+pathFromAll: String -> Path
 pathFromAll str =
   parsePath (extractPath str)
 
@@ -218,7 +222,7 @@ extractFragment str =
     |> List.head
     |> Maybe.withDefault ""
 
-parseFragment: String -> List String
+parseFragment: String -> Fragment
 parseFragment str =
   let
     parts = 
@@ -226,7 +230,7 @@ parseFragment str =
   in
     List.filter notEmpty parts
 
-fragmentFromAll: String -> List String
+fragmentFromAll: String -> Fragment
 fragmentFromAll str =
   parseFragment (extractFragment str)
 
@@ -265,11 +269,11 @@ queryTuples queryString =
   in
     List.map queryStringElementToTuple splitted
 
-parseQuery: String -> Dict.Dict String String
+parseQuery: String -> Query
 parseQuery str =
   Dict.fromList (queryTuples str)
 
-queryFromAll: String -> Dict.Dict String String
+queryFromAll: String -> Query
 queryFromAll all =
   all
     |> extractQuery
