@@ -216,17 +216,32 @@ testToString =
     url1 =
       {
         protocol = "http",
-        host = ["www", "foo", "com"],
-        fragment = ["a", "b"],
+        username = "",
         password = "",
+        host = ["www", "foo", "com"],
         path = ["users", "1"],
         port' = 2000,
-        query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2",
-        username = ""
+        fragment = ["a", "b"],
+        query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
+      }
+    url2 =
+      {
+        protocol = "",
+        username = "",
+        password = "",
+        host = [],
+        port' = 0,
+        path = [],
+        fragment = ["a", "b"],
+        query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
       }
     inputs = 
       [
-        (url1, "http://www.foo.com:2000/users/1#a/b?k=2&q=1")
+        (url1, "http://www.foo.com:2000/users/1#a/b?k=2&q=1"),
+        ({url1 - protocol | protocol = ""}, "www.foo.com:2000/users/1#a/b?k=2&q=1"),
+        ({url1 - port' | port' = 80}, "http://www.foo.com/users/1#a/b?k=2&q=1"),
+        ({url1 - fragment | fragment = []}, "http://www.foo.com:2000/users/1?k=2&q=1"),
+        ({url1 - query | query = Dict.empty}, "http://www.foo.com:2000/users/1#a/b")
       ]
     run (input, expected) =
       test "Generates the url"

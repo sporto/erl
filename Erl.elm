@@ -27,6 +27,7 @@ import Debug
 -- TYPES
 
 type alias Host = List String
+type alias Port = String
 type alias Fragment = List String
 type alias Query = Dict.Dict String String
 
@@ -34,14 +35,14 @@ type alias Query = Dict.Dict String String
 
 -}
 type alias Url = {
-  host: Host,
-  fragment: Fragment,
-  password: String,
-  path: List String,
-  port': Int,
   protocol: String,
-  query: Query,
-  username: String
+  username: String,
+  password: String,
+  host: Host,
+  port': Int,
+  path: List String,
+  fragment: Fragment,
+  query: Query
 }
 
 
@@ -303,22 +304,75 @@ queryToString query =
   in
     join "&" parts
 
+protocolComponent: Url -> String
+protocolComponent url =
+  case url.protocol of
+    "" -> ""
+    _ ->
+      url.protocol ++ "://"
+
+hostComponent: Url -> String
+hostComponent url =
+  join "." url.host
+
+portComponent: Url -> String
+portComponent url =
+ case url.port' of
+    0 -> 
+      ""
+    80 ->
+      ""
+    _ ->
+      ":" ++ (Basics.toString url.port')
+
+pathComponent: Url -> String
+pathComponent url =
+  "/" ++ (join "/" url.path)
+
+fragmentComponent: Url -> String
+fragmentComponent url =
+  case url.fragment of
+    [] -> ""
+    _ ->
+      "#" ++ (join "/" url.fragment)
+
+queryComponent: Url -> String
+queryComponent url =
+  case Dict.isEmpty url.query of
+    True -> ""
+    False ->
+      "?" ++ (queryToString url.query)
+
 {-| Generate url string from an Erl.Url record
+
+    url = {
+      protocol = "http",
+      username = "",
+      password = "",
+      host = ["www", "foo", "com"],
+      path = ["users", "1"],
+      port' = 2000,
+      fragment = ["a", "b"],
+      query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
+    }
+
+    Erl.toString url == http://www.foo.com:2000/users/1#a/b?k=2&q=1
+
 -}
 toString: Url -> String
 toString url =
   let
     protocol' =
-      url.protocol ++ "://"
+      protocolComponent url
     host' =
-      join "." url.host
+      hostComponent url
     port' =
-      ":" ++ (Basics.toString url.port')
+      portComponent url
     path' =
-      "/" ++ (join "/" url.path)
+      pathComponent url
     fragment' =
-      "#" ++ (join "/" url.fragment)
+      fragmentComponent url
     query' =
-      "?" ++ (queryToString url.query)
+      queryComponent url
   in
     protocol' ++ host' ++ port' ++ path' ++ fragment' ++ query'

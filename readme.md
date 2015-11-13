@@ -44,4 +44,6 @@ npm test
 
 - Username
 - Password
-- Construction
+- Create empty Url
+- Convenience methods for updating parts
+- Methods for adding to query / replacing / removing / cleaning
