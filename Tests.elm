@@ -156,7 +156,8 @@ testFragmentExtract =
   let
     inputs =
       [
-        ("#/users/1", "/users/1")
+        ("#/users/1", "/users/1"),
+        ("www.foo.com/hello#/users/1?a=1", "/users/1")
       ]
     run (input, expected) =
       test "Extracts the fragment"

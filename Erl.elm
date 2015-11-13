@@ -204,11 +204,14 @@ pathFromAll str =
 -}
 extractFragment: String -> String
 extractFragment str =
-  let
-    parts = split "#" str
-    maybeFirst = List.head (List.drop 1 parts)
-  in
-    Maybe.withDefault "" maybeFirst
+  str
+    |> split "#"
+    |> List.drop 1
+    |> List.head
+    |> Maybe.withDefault ""
+    |> split "?"
+    |> List.head
+    |> Maybe.withDefault ""
 
 parseFragment: String -> List String
 parseFragment str =
