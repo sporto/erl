@@ -170,7 +170,8 @@ testFragment =
   let
     inputs =
       [
-        ("#/users/1", ["users", "1"])
+        ("#/users/1", ["users", "1"]),
+        ("www.foo.com#/users/1?a=1", ["users", "1"])
       ]
     run (input, expected) =
       test "Parses the fragment"
@@ -181,7 +182,19 @@ testFragment =
 
 -- QUERY
 
-testQuery: Test
+testQueryExtract =
+  let
+    inputs =
+      [
+        ("http://foo.com/users?a=1", "a=1")
+      ]
+    run (input, expected) =
+      test "Extracts the query"
+        (assertEqual expected (Erl.extractQuery input))
+  in
+    suite "Query"
+      (List.map run inputs)
+
 testQuery =
   let
     inputs = 
@@ -210,5 +223,6 @@ all =
       testPortExtract,
       testProtocol,
       testProtocolExtract,
-      testQuery
+      testQuery,
+      testQueryExtract
     ]

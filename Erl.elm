@@ -4,6 +4,7 @@ module Erl (
   extractPath, 
   extractPort,
   extractProtocol, 
+  extractQuery,
   parse, 
   Url
   ) where
@@ -14,7 +15,7 @@ module Erl (
 @docs Url
 
 # Common Helpers
-@docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, parse
+@docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, extractQuery, parse
 -}
 
 import Dict
@@ -227,9 +228,11 @@ fragmentFromAll str =
 
 -- QUERY
 
--- "../foo?query=1" --> "query=1"
-extractQueryString: String -> String
-extractQueryString str =
+{-| Extract the query string from the url
+
+-}
+extractQuery: String -> String
+extractQuery str =
   let
     parts = split "?" str
     maybeFirst = List.head (List.drop 1 parts)
@@ -265,7 +268,7 @@ parseQuery str =
 queryFromAll: String -> Dict.Dict String String
 queryFromAll all =
   all
-    |> extractQueryString
+    |> extractQuery
     |> parseQuery
 
 -- MAIN
