@@ -34,11 +34,11 @@ import Debug
 
 -- TYPES
 
-{-| Query: A Dict that holds keys and values for the query string
+{-| A Dict that holds keys and values for the query string
 -}
 type alias Query = Dict.Dict String String
 
-{-| Url: record that holds url attributes
+{-| Record that holds url attributes
 -}
 type alias Url = {
   protocol: String,
