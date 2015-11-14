@@ -260,7 +260,8 @@ testToString =
         -- encodes values in fragment
         ({url1 | fragment <- ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1#aa%2Fbb/2?k=2&q=1"),
         -- encodes values in query
-        ({url1 | query <- Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1#a/b?a%2Fb=c%2Fd")
+        ({url1 | query <- Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1#a/b?a%2Fb=c%2Fd"),
+        (url2, "#a/b?k=2&q=1")
       ]
     run (input, expected) =
       test "Generates the url"

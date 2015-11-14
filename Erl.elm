@@ -345,7 +345,10 @@ pathComponent url =
     encoded =
       List.map Http.uriEncode url.path
   in
-    "/" ++ (join "/" encoded)
+    if (List.length url.path) == 0 then
+      ""
+    else
+      "/" ++ (join "/" encoded)
 
 fragmentComponent: Url -> String
 fragmentComponent url =
