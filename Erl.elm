@@ -5,6 +5,7 @@ module Erl (
   extractPort,
   extractProtocol, 
   extractQuery,
+  new,
   parse,
   toString,
   Url,
@@ -23,7 +24,7 @@ module Erl (
 @docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, extractQuery
 
 # Construct
-@docs toString
+@docs new, toString
 
 -}
 
@@ -368,6 +369,35 @@ queryComponent url =
     False ->
       "?" ++ (queryToString url.query)
 
+{-| Generate an empty Erl.Url record
+
+    Erl.new ==
+
+    {
+      protocol = "",
+      username = "",
+      password = "",
+      host = [],
+      path = [],
+      port' = 0,
+      fragment = [],
+      query = Dict.empty
+    }
+
+-}
+new: Url
+new =
+  {
+    protocol = "",
+    username = "",
+    password = "",
+    host = [],
+    path = [],
+    port' = 0,
+    fragment = [],
+    query = Dict.empty
+  }
+
 {-| Generate url string from an Erl.Url record
 
     url = {
@@ -401,3 +431,5 @@ toString url =
       queryComponent url
   in
     protocol' ++ host' ++ port' ++ path' ++ fragment' ++ query'
+
+

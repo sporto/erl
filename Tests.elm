@@ -270,6 +270,25 @@ testToString =
     suite "toString"
       (List.map run inputs)
 
+testNew =
+  let
+    expected =
+      {
+        protocol = "",
+        username = "",
+        password = "",
+        host = [],
+        port' = 0,
+        path = [],
+        fragment = [],
+        query = Dict.empty
+      }
+    actual =
+      Erl.new
+  in
+    test "Generates an empty url"
+      (assertEqual expected actual)
+
 -- suite : String -> List Test -> Test
 all: Test
 all = 
@@ -279,6 +298,7 @@ all =
       testFragmentExtract,
       testHost,
       testHostExtract,
+      testNew,
       testPath,
       testPathExtract,
       testPort,
