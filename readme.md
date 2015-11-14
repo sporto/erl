@@ -93,5 +93,4 @@ npm test
 
 - Username
 - Password
-- Convenience methods for updating parts
-- Methods for adding to query / replacing / removing / cleaning
+- Maybe more convenience methods for updating parts
