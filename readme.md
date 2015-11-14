@@ -2,7 +2,7 @@
 
 A URL parsing and construction library for ELM
 
-## Parse
+## `parse` a url string
 
 ```elm
 -- Given a url string
@@ -27,10 +27,43 @@ Erl.parse url
 }
 ```
 
-## toString
+## Construct
+
+### `new`
 
 ```elm
--- Given a Erl.Url record (url)
+-- Create a Erl.Url record:
+
+url = 
+  Erl.new
+```
+
+### Update
+
+```
+-- Modify the protocol
+{ url | protocol <- "https" }
+
+-- Modify host
+{url | host <- ["api", "acme", "com"] }
+
+-- Modify port
+{ url | port' <- 9000 }
+
+-- Modify path
+{url | path <- ["users", "1"] }
+
+-- Modify fragment (hash)
+{url | fragment <- ["!", "user", "1"] }
+
+-- Modify query string
+
+```
+
+### `toString`
+
+```elm
+-- Given a Erl.Url record (url):
 
 Erl.toString url 
 
@@ -54,7 +87,5 @@ npm test
 
 - Username
 - Password
-- Create empty Url
-- Encode / Decode query
 - Convenience methods for updating parts
 - Methods for adding to query / replacing / removing / cleaning
