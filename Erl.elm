@@ -1,4 +1,5 @@
 module Erl (
+  clearQuery,
   extractFragment,
   extractHost,
   extractPath, 
@@ -7,6 +8,8 @@ module Erl (
   extractQuery,
   new,
   parse,
+  unsetQuery,
+  setQuery,
   toString,
   Url,
   Query
@@ -25,6 +28,9 @@ module Erl (
 
 # Construct
 @docs new, toString
+
+# Mutation helpers
+@docs clearQuery, unsetQuery, setQuery
 
 -}
 
@@ -397,6 +403,38 @@ new =
     fragment = [],
     query = Dict.empty
   }
+
+{-| Clears the current query string
+    
+    Erl.clearQuery url
+-}
+clearQuery: Url -> Url
+clearQuery url =
+  {url | query <- Dict.empty }
+
+{-| Set key/value in query string
+    
+    Erl.setQuery key value url
+-}
+setQuery: String -> String -> Url -> Url
+setQuery key val url =
+  let
+    updated =
+      Dict.insert key val url.query
+  in
+    {url | query <- updated }
+
+{-| Removes key from query string
+    
+    Erl.unsetQuery key url
+-}
+unsetQuery: String -> Url -> Url
+unsetQuery key url =
+  let
+    updated =
+      Dict.remove key url.query
+  in
+    {url | query <- updated }
 
 {-| Generate url string from an Erl.Url record
 

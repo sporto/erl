@@ -289,6 +289,46 @@ testNew =
     test "Generates an empty url"
       (assertEqual expected actual)
 
+testQuerySet =
+  let
+    expected =
+      Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2"
+    actual =
+      Erl.new
+        |> Erl.setQuery "a" "1"
+        |> Erl.setQuery "b" "2"
+        |> .query
+  in
+    test "Sets the query"
+      (assertEqual expected actual)
+
+testQueryUnset =
+  let
+    expected =
+      Dict.empty |> Dict.insert "a" "1"
+    actual =
+      Erl.new
+        |> Erl.setQuery "a" "1"
+        |> Erl.setQuery "b" "2"
+        |> Erl.unsetQuery "b"
+        |> .query
+  in
+    test "Unsets the query"
+      (assertEqual expected actual)
+
+testQueryClear =
+  let
+    expected =
+      Dict.empty
+    actual =
+      Erl.new
+        |> Erl.setQuery "a" "1"
+        |> Erl.clearQuery
+        |> .query
+  in
+    test "Cleans the query"
+      (assertEqual expected actual)
+
 -- suite : String -> List Test -> Test
 all: Test
 all = 
@@ -306,6 +346,9 @@ all =
       testProtocol,
       testProtocolExtract,
       testQuery,
+      testQueryClear,
       testQueryExtract,
+      testQuerySet,
+      testQueryUnset,
       testToString
     ]

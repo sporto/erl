@@ -38,7 +38,7 @@ url =
   Erl.new
 ```
 
-### Update
+### Mutations
 
 ```elm
 -- Modify the protocol
@@ -56,8 +56,14 @@ url =
 -- Modify fragment (hash)
 {url | fragment <- ["!", "user", "1"] }
 
--- Modify query string
+-- Clear query string
+Erl.clearQuery url
 
+-- Set query string key/value
+Erl.setQuery "key" "value" url
+
+-- Unset query string key/value
+Erl.unsetQuery "key" url
 ```
 
 ### `toString`
