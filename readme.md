@@ -40,7 +40,7 @@ url =
 
 ### Update
 
-```
+```elm
 -- Modify the protocol
 { url | protocol <- "https" }
 
