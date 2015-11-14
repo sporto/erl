@@ -32,7 +32,7 @@ Erl.parse url
 ### `new`
 
 ```elm
--- Create a Erl.Url record:
+-- Construct an empty Erl.Url record:
 
 url = 
   Erl.new
