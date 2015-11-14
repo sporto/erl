@@ -28,9 +28,9 @@ module Erl (
 -}
 
 import Dict
-import String exposing (..)
+import Http
 import Regex
-import Debug
+import String exposing (..)
 
 -- TYPES
 
@@ -305,8 +305,10 @@ queryToString query =
   let
     tuples =
       Dict.toList query
+    encodedTuples =
+      List.map (\(x, y) -> (Http.uriEncode x, Http.uriEncode y)) tuples
     parts =
-      List.map (\(a, b) -> a ++ "=" ++ b) tuples
+      List.map (\(a, b) -> a ++ "=" ++ b) encodedTuples
   in
     join "&" parts
 
@@ -319,7 +321,7 @@ protocolComponent url =
 
 hostComponent: Url -> String
 hostComponent url =
-  join "." url.host
+  Http.uriEncode (join "." url.host)
 
 portComponent: Url -> String
 portComponent url =
@@ -333,14 +335,22 @@ portComponent url =
 
 pathComponent: Url -> String
 pathComponent url =
-  "/" ++ (join "/" url.path)
+  let
+    encoded =
+      List.map Http.uriEncode url.path
+  in
+    "/" ++ (join "/" encoded)
 
 fragmentComponent: Url -> String
 fragmentComponent url =
-  case url.fragment of
-    [] -> ""
-    _ ->
-      "#" ++ (join "/" url.fragment)
+  let
+    encoded =
+      List.map Http.uriEncode url.fragment
+  in
+    case url.fragment of
+      [] -> ""
+      _ ->
+        "#" ++ (join "/" encoded)
 
 queryComponent: Url -> String
 queryComponent url =

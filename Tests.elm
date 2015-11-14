@@ -63,7 +63,8 @@ testPort =
   let
     inputs =
       [
-        ("http://example.com:3000/users", 3000)
+        ("http://example.com:3000/users", 3000),
+        ("http://example.com/users", 80)
       ]
     run (input, expected) =
       test "Extracts the port"
@@ -84,6 +85,7 @@ testHostExtract =
     inputs =
       [
         ("http://foo.com", "foo.com"),
+        ("http://12345.com", "12345.com"),
         ("http://api.foo.com", "api.foo.com"),
         ("http://api.foo.com/", "api.foo.com"),
         ("http://api.foo.com/users", "api.foo.com"),
@@ -241,7 +243,15 @@ testToString =
         ({url1 - protocol | protocol = ""}, "www.foo.com:2000/users/1#a/b?k=2&q=1"),
         ({url1 - port' | port' = 80}, "http://www.foo.com/users/1#a/b?k=2&q=1"),
         ({url1 - fragment | fragment = []}, "http://www.foo.com:2000/users/1?k=2&q=1"),
-        ({url1 - query | query = Dict.empty}, "http://www.foo.com:2000/users/1#a/b")
+        ({url1 - query | query = Dict.empty}, "http://www.foo.com:2000/users/1#a/b"),
+        -- encodes values in host
+        ({url1 | host <- ["aa/bb", "com"]}, "http://aa%2Fbb.com:2000/users/1#a/b?k=2&q=1"),
+        -- encodes values in path
+        ({url1 | path <- ["aa/bb", "2"]}, "http://www.foo.com:2000/aa%2Fbb/2#a/b?k=2&q=1"),
+        -- encodes values in fragment
+        ({url1 | fragment <- ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1#aa%2Fbb/2?k=2&q=1"),
+        -- encodes values in query
+        ({url1 | query <- Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1#a/b?a%2Fb=c%2Fd")
       ]
     run (input, expected) =
       test "Generates the url"

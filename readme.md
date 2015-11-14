@@ -55,5 +55,6 @@ npm test
 - Username
 - Password
 - Create empty Url
+- Encode / Decode query
 - Convenience methods for updating parts
 - Methods for adding to query / replacing / removing / cleaning
