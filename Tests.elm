@@ -38,6 +38,53 @@ testProtocolExtract =
     suite "Extract protocol"
       (List.map run inputs)
 
+-- USERNAME
+
+-- PASSWORD
+
+-- HOST
+
+-- host must be a-z 0-9 and -
+
+testHostExtract: Test
+testHostExtract =
+  let
+    inputs =
+      [
+        ("http://foo.com", "foo.com"),
+        ("http://12345.com", "12345.com"),
+        ("http://api.foo.com", "api.foo.com"),
+        ("http://api.foo.com/", "api.foo.com"),
+        ("http://api.foo.com/users", "api.foo.com"),
+        ("http://api.foo.com/users", "api.foo.com"),
+        ("foo.com", "foo.com"),
+        ("foo-.com", "foo-.com"),
+        ("foo.com/users", "foo.com"),
+        ("api.foo.com", "api.foo.com"),
+        ("users/1/edit", ""),
+        ("users/index.html", "")
+      ]
+    run (input, expected) =
+      test ("Extracts host " ++ input)
+        (assertEqual expected (Erl.extractHost input))
+  in
+    suite "Extract host"
+      (List.map run inputs)
+
+testHost: Test
+testHost =
+  let
+    inputs =
+      [
+        ("http://www.foo.com/users" , ["www", "foo", "com"])
+      ]
+    run (input, expected) =
+      test ("Parses host in " ++ input)
+        (assertEqual expected (Erl.parse input).host)
+  in
+    suite "Parses host"
+      (List.map run inputs)
+
 -- PORT
 
 testPortExtract: Test
@@ -73,49 +120,6 @@ testPort =
     suite "Port"
       (List.map run inputs)
 
--- USERNAME
-
--- PASSWORD
-
--- HOST
-
-testHostExtract: Test
-testHostExtract =
-  let
-    inputs =
-      [
-        ("http://foo.com", "foo.com"),
-        ("http://12345.com", "12345.com"),
-        ("http://api.foo.com", "api.foo.com"),
-        ("http://api.foo.com/", "api.foo.com"),
-        ("http://api.foo.com/users", "api.foo.com"),
-        ("foo.com", "foo.com"),
-        ("foo.com/users", "foo.com"),
-        ("api.foo.com", "api.foo.com"),
-        ("users/1/edit", ""),
-        ("users/index.html", "")
-      ]
-    run (input, expected) =
-      test ("Extracts host " ++ input)
-        (assertEqual expected (Erl.extractHost input))
-  in
-    suite "Extract host"
-      (List.map run inputs)
-
-testHost: Test
-testHost =
-  let
-    inputs =
-      [
-        ("http://www.foo.com/users" , ["www", "foo", "com"])
-      ]
-    run (input, expected) =
-      test ("Parses host in " ++ input)
-        (assertEqual expected (Erl.parse input).host)
-  in
-    suite "Parses host"
-      (List.map run inputs)
-
 -- PATH
 
 testPathExtract: Test
@@ -143,7 +147,9 @@ testPath =
     inputs =
       [
         ("http://foo.com/users/index.html?a=1", ["users", "index.html"]),
-        ("/users/1/edit", ["users", "1", "edit"])
+        ("/users/1/edit", ["users", "1", "edit"]),
+        -- it decodes
+        ("/us%2Fers/1/edit", ["us/ers", "1", "edit"])
       ]
     run (input, expected) =
       test "Parses the path"
@@ -173,7 +179,9 @@ testFragment =
     inputs =
       [
         ("#/users/1", ["users", "1"]),
-        ("www.foo.com#/users/1?a=1", ["users", "1"])
+        ("www.foo.com#/users/1?a=1", ["users", "1"]),
+        -- it decodes
+        ("#/us%2Fers/1", ["us/ers", "1"])
       ]
     run (input, expected) =
       test "Parses the fragment"
@@ -201,7 +209,8 @@ testQuery =
   let
     inputs = 
       [
-        ("users?a=1&b=2", Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2")
+        ("users?a=1&b=2", Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2"),
+        ("users?a%3F=1%26", Dict.empty |> Dict.insert "a?" "1&")
       ]
     run (input, expected) =
       test "Parses the query"

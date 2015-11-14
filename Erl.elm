@@ -140,19 +140,23 @@ extractProtocol str =
 {-| Extract the host from the url
 
 -}
+
+-- valid host: a-z 0-9 and -
+
 extractHost: String -> String
 extractHost str =
   str
     |> rightFromOrSame "://"
     |> leftFrom "/"
-    |> Regex.find (Regex.AtMost 1) (Regex.regex "(\\w+\\.)+\\w+")
+    |> Regex.find (Regex.AtMost 1) (Regex.regex "((\\w|-)+\\.)+(\\w|-)+")
     |> List.map .match
     |> List.head
     |> Maybe.withDefault ""
 
 parseHost: String -> List String
 parseHost str =
-  split "." str
+  str 
+    |> split "."
 
 host: String -> List String
 host str =
@@ -198,11 +202,10 @@ extractPath str =
 
 parsePath: String -> List String
 parsePath str =
-  let
-    parts =
-      split "/" str
-  in
-    List.filter notEmpty parts
+  str
+    |> split "/"
+    |> List.filter notEmpty
+    |> List.map Http.uriDecode
 
 pathFromAll: String -> List String
 pathFromAll str =
@@ -226,11 +229,10 @@ extractFragment str =
 
 parseFragment: String -> List String
 parseFragment str =
-  let
-    parts = 
-      split "/" str
-  in
-    List.filter notEmpty parts
+  str
+    |> split "/"
+    |> List.filter notEmpty
+    |> List.map Http.uriDecode
 
 fragmentFromAll: String -> List String
 fragmentFromAll str =
@@ -255,12 +257,16 @@ queryStringElementToTuple element =
   let
     splitted =
       split "=" element
-    first l =
-      Maybe.withDefault "" (List.head l)
-    second l =
-      Maybe.withDefault "" (List.head (List.drop 1 l))
+    first =
+      Maybe.withDefault "" (List.head splitted)
+    firstDecoded =
+      Http.uriDecode first
+    second =
+      Maybe.withDefault "" (List.head (List.drop 1 splitted))
+    secondDecoded =
+      Http.uriDecode second
   in
-    (first splitted, second splitted)
+    (firstDecoded, secondDecoded)
 
 -- "a=1&b=2" --> [("a", "1"), ("b", "2")]
 queryTuples: String -> List (String, String)
