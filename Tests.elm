@@ -4,9 +4,7 @@ import String
 import Dict
 import Erl
 
-import ElmTest.Test exposing (test, Test, suite)
-import ElmTest.Assertion exposing (assert, assertEqual)
-import ElmTest.Runner.Element exposing (runDisplay)
+import ElmTest exposing (..)
 
 -- PROTOCOL
 
@@ -249,18 +247,18 @@ testToString =
     inputs = 
       [
         (url1, "http://www.foo.com:2000/users/1#a/b?k=2&q=1"),
-        ({url1 - protocol | protocol = ""}, "www.foo.com:2000/users/1#a/b?k=2&q=1"),
-        ({url1 - port' | port' = 80}, "http://www.foo.com/users/1#a/b?k=2&q=1"),
-        ({url1 - fragment | fragment = []}, "http://www.foo.com:2000/users/1?k=2&q=1"),
-        ({url1 - query | query = Dict.empty}, "http://www.foo.com:2000/users/1#a/b"),
+        ({url1 | protocol = ""}, "www.foo.com:2000/users/1#a/b?k=2&q=1"),
+        ({url1 | port' = 80}, "http://www.foo.com/users/1#a/b?k=2&q=1"),
+        ({url1 | fragment = []}, "http://www.foo.com:2000/users/1?k=2&q=1"),
+        ({url1 | query = Dict.empty}, "http://www.foo.com:2000/users/1#a/b"),
         -- encodes values in host
-        ({url1 | host <- ["aa/bb", "com"]}, "http://aa%2Fbb.com:2000/users/1#a/b?k=2&q=1"),
+        ({url1 | host = ["aa/bb", "com"]}, "http://aa%2Fbb.com:2000/users/1#a/b?k=2&q=1"),
         -- encodes values in path
-        ({url1 | path <- ["aa/bb", "2"]}, "http://www.foo.com:2000/aa%2Fbb/2#a/b?k=2&q=1"),
+        ({url1 | path = ["aa/bb", "2"]}, "http://www.foo.com:2000/aa%2Fbb/2#a/b?k=2&q=1"),
         -- encodes values in fragment
-        ({url1 | fragment <- ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1#aa%2Fbb/2?k=2&q=1"),
+        ({url1 | fragment = ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1#aa%2Fbb/2?k=2&q=1"),
         -- encodes values in query
-        ({url1 | query <- Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1#a/b?a%2Fb=c%2Fd"),
+        ({url1 | query = Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1#a/b?a%2Fb=c%2Fd"),
         (url2, "#a/b?k=2&q=1")
       ]
     run (input, expected) =

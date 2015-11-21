@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/sporto/erl#readme",
   "dependencies": {
-    "elm-test": "^0.6.5"
+    "elm-test": "^0.16.0-beta"
   }
 }

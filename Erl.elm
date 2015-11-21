@@ -410,7 +410,7 @@ new =
 -}
 clearQuery: Url -> Url
 clearQuery url =
-  {url | query <- Dict.empty }
+  {url | query = Dict.empty }
 
 {-| Set key/value in query string
     
@@ -422,7 +422,7 @@ setQuery key val url =
     updated =
       Dict.insert key val url.query
   in
-    {url | query <- updated }
+    {url | query = updated }
 
 {-| Removes key from query string
     
@@ -434,7 +434,7 @@ unsetQuery key url =
     updated =
       Dict.remove key url.query
   in
-    {url | query <- updated }
+    {url | query = updated }
 
 {-| Generate url string from an Erl.Url record
 
