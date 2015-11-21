@@ -3,6 +3,7 @@ module Erl (
   extractFragment,
   extractHost,
   extractPath, 
+  extractPort,
   extractProtocol, 
   extractQuery,
   new,
@@ -23,7 +24,7 @@ module Erl (
 @docs parse
 
 # Parse helpers
-@docs extractFragment, extractHost, extractPath, extractProtocol, extractQuery
+@docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, extractQuery
 
 # Construct
 @docs new, toString
