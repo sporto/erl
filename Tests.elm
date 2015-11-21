@@ -85,23 +85,23 @@ testHost =
 
 -- PORT
 
-testPortExtract: Test
-testPortExtract =
-  let
-    inputs =
-      [
-        ("http://example.com:3000", 3000),
-        ("http://example.com:3000/", 3000),
-        ("http://example.com:3000/users", 3000),
-        ("http://example.com", 80),
-        ("http://example.com/users", 80)
-      ]
-    run (input, expected) =
-      test "Extracts the port"
-        (assertEqual expected (Erl.extractPort input))
-  in
-    suite "Extract port"
-      (List.map run inputs)
+--testPortExtract: Test
+--testPortExtract =
+--  let
+--    inputs =
+--      [
+--        ("http://example.com:3000", 3000),
+--        ("http://example.com:3000/", 3000),
+--        ("http://example.com:3000/users", 3000),
+--        ("http://example.com", 80),
+--        ("http://example.com/users", 80)
+--      ]
+--    run (input, expected) =
+--      test "Extracts the port"
+--        (assertEqual expected (Erl.extractPort input))
+--  in
+--    suite "Extract port"
+--      (List.map run inputs)
 
 testPort: Test
 testPort =
@@ -340,7 +340,6 @@ all =
       testPath,
       testPathExtract,
       testPort,
-      testPortExtract,
       testProtocol,
       testProtocolExtract,
       testQuery,
