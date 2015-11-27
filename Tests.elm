@@ -155,6 +155,7 @@ testPath =
       [
         ("http://foo.com/users/index.html?a=1", ["users", "index.html"]),
         ("/users/1/edit", ["users", "1", "edit"]),
+        ("//localhost/users/1/edit", ["users", "1", "edit"]),
         -- it decodes
         ("/us%2Fers/1/edit", ["us/ers", "1", "edit"])
       ]
