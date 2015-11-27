@@ -12,7 +12,8 @@ testProtocol =
   let
     inputs =
       [
-        ("http://example.com:3000", "http")
+        ("http://example.com:3000", "http"),
+        ("http://localhost:7000", "http")
       ]
     run (input, expected) =
       test "Protocol"
@@ -55,12 +56,18 @@ testHostExtract =
         ("http://api.foo.com/", "api.foo.com"),
         ("http://api.foo.com/users", "api.foo.com"),
         ("http://api.foo.com/users", "api.foo.com"),
+        ("http://localhost/users", "localhost"),
+        ("http://localhost", "localhost"),
+        ("http://localhost/localhost", "localhost"),
+        ("http://192.168.0.0", "192.168.0.0"),
+        ("http://192.168.0.0/localhost", "192.168.0.0"),
         ("foo.com", "foo.com"),
         ("foo-.com", "foo-.com"),
         ("foo.com/users", "foo.com"),
         ("api.foo.com", "api.foo.com"),
         ("users/1/edit", ""),
-        ("users/index.html", "")
+        ("users/index.html", ""),
+        ("/users/index.html", "")
       ]
     run (input, expected) =
       test ("Extracts host " ++ input)
@@ -126,7 +133,9 @@ testPathExtract =
     inputs =
       [
         ("http://foo.com/users/index.html", "/users/index.html"),
-        ("foo.com/users/index.html", "/users/index.html"),
+        ("//foo.com/users/index.html", "/users/index.html"),
+        ("http://localhost/users/index.html", "/users/index.html"),
+        ("//localhost/localhost/users/index.html", "/localhost/users/index.html"),
         ("/users/index.html", "/users/index.html"),
         ("users/index.html", "users/index.html"),
         ("users/index.html#xyz", "users/index.html"),
@@ -259,6 +268,7 @@ testToString =
         ({url1 | fragment = ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1#aa%2Fbb/2?k=2&q=1"),
         -- encodes values in query
         ({url1 | query = Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1#a/b?a%2Fb=c%2Fd"),
+        ({url1 | host = ["localhost"]}, "http://localhost:2000/users/1#a/b?k=2&q=1"),
         (url2, "#a/b?k=2&q=1")
       ]
     run (input, expected) =

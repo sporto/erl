@@ -94,29 +94,11 @@ rightFromOrSame delimiter str =
       |> List.head
       |> Maybe.withDefault ""
 
-
-  --let
-  --  ixs =
-  --    indexes delimiter str
-  --in
-  --  case ixs of
-  --    [] ->
-  --      ""
-  --    _ ->
-  --      ""
-
-  --let
-  --  rx =
-  --    Regex.regex ("(?<=\#).+")
-  --in
-  --  str
-  --    |> Regex.find (Regex.AtMost 1) rx
-  --    |> List.map .match
-  --    |> List.head
-  --    |> Maybe.withDefault ""
-
-leftFrom: String -> String -> String
-leftFrom delimiter str =
+-- "a/b" -> "a"
+-- "a"   => "a"
+-- "/b"  => ""
+leftFromOrSame: String -> String -> String
+leftFromOrSame delimiter str =
   let
     parts =
       split delimiter str
@@ -124,6 +106,26 @@ leftFrom delimiter str =
     parts
       |> List.head
       |> Maybe.withDefault ""
+
+-- "a/b" -> "a"
+-- "/b"  -> ""
+-- "a"   -> ""
+leftFrom: String -> String -> String
+leftFrom delimiter str =
+  let
+    parts =
+      split delimiter str
+    head =
+      List.head parts
+  in
+    case List.length parts of
+      0 ->
+        ""
+      1 ->
+        ""
+      _ ->
+        head |> Maybe.withDefault ""
+
 
 -- PROTOCOL
 
@@ -152,13 +154,21 @@ extractProtocol str =
 
 extractHost: String -> String
 extractHost str =
-  str
-    |> rightFromOrSame "://"
-    |> leftFrom "/"
-    |> Regex.find (Regex.AtMost 1) (Regex.regex "((\\w|-)+\\.)+(\\w|-)+")
-    |> List.map .match
-    |> List.head
-    |> Maybe.withDefault ""
+  let
+    dotsRx =
+      "((\\w|-)+\\.)+(\\w|-)+"
+    localhostRx =
+      "localhost"
+    rx =
+      "(" ++ dotsRx ++ "|" ++ localhostRx ++ ")"
+  in
+    str
+      |> rightFromOrSame "//"
+      |> leftFromOrSame "/"
+      |> Regex.find (Regex.AtMost 1) (Regex.regex rx)
+      |> List.map .match
+      |> List.head
+      |> Maybe.withDefault ""
 
 parseHost: String -> List String
 parseHost str =
@@ -202,10 +212,10 @@ extractPath str =
       extractHost str
   in
     str
-      |> rightFromOrSame "://"
-      |> leftFrom "?"
-      |> leftFrom "#"
-      |> Regex.replace Regex.All (Regex.regex host) (\_ -> "")
+      |> rightFromOrSame "//"
+      |> leftFromOrSame "?"
+      |> leftFromOrSame "#"
+      |> Regex.replace (Regex.AtMost 1) (Regex.regex host) (\_ -> "")
 
 parsePath: String -> List String
 parsePath str =

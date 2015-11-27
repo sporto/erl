@@ -85,6 +85,7 @@ Erl.toString url
 ## Test
 
 ```
+elm-package install
 npm i
 npm test
 ```
