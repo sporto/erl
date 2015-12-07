@@ -1,0 +1,4 @@
+elm:
+  build: .
+  volumes:
+  - .:/usr/app
