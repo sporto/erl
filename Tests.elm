@@ -139,7 +139,8 @@ testPathExtract =
         ("/users/index.html", "/users/index.html"),
         ("users/index.html", "users/index.html"),
         ("users/index.html#xyz", "users/index.html"),
-        ("users/index.html?a=1", "users/index.html")
+        ("users/index.html?a=1", "users/index.html"),
+        ("http://example.com:2000", "")
       ]
     run (input, expected) =
       test ("Extracts path " ++ input)
@@ -279,6 +280,23 @@ testToString =
     suite "toString"
       (List.map run inputs)
 
+testRoundTrips =
+  let
+    inputs =
+      [
+        "http://example.com",
+        "http://example.com:2000",
+        "http://example.com/users/1",
+        "http://example.com/users/1?color=red",
+        "http://example.com/users/1#a/b?color=red"
+      ]
+    run (input) =
+      test "Round trip"
+        (assertEqual input (input |> Erl.parse |> Erl.toString))
+  in
+    suite "Round trip"
+      (List.map run inputs)
+
 testNew =
   let
     expected =
@@ -359,5 +377,6 @@ all =
       testQueryExtract,
       testQuerySet,
       testQueryUnset,
+      testRoundTrips,
       testToString
     ]

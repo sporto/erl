@@ -188,7 +188,7 @@ extractPort: String -> Int
 extractPort str =
   let
     rx =
-      Regex.regex "(?:)\\d+"
+      Regex.regex ":\\d+"
     res =
       Regex.find (Regex.AtMost 1) rx str
   in
@@ -196,6 +196,7 @@ extractPort str =
       |> List.map .match
       |> List.head
       |> Maybe.withDefault ""
+      |> String.dropLeft 1
       |> toInt
       |> Result.toMaybe
       |> Maybe.withDefault 80
@@ -216,6 +217,7 @@ extractPath str =
       |> leftFromOrSame "?"
       |> leftFromOrSame "#"
       |> Regex.replace (Regex.AtMost 1) (Regex.regex host) (\_ -> "")
+      |> Regex.replace (Regex.AtMost 1) (Regex.regex ":\\d+") (\_ -> "")
 
 parsePath: String -> List String
 parsePath str =
@@ -292,7 +294,10 @@ queryTuples queryString =
     splitted =
       split "&" queryString
   in
-    List.map queryStringElementToTuple splitted
+    if String.isEmpty queryString then
+      []
+    else
+      List.map queryStringElementToTuple splitted
 
 parseQuery: String -> Query
 parseQuery str =
