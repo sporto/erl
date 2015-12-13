@@ -169,7 +169,7 @@ testPath =
 
 -- FRAGMENT
 
-testFragmentExtract =
+testHashExtract =
   let
     inputs =
       [
@@ -177,10 +177,10 @@ testFragmentExtract =
         ("www.foo.com/hello#/users/1?a=1", "/users/1")
       ]
     run (input, expected) =
-      test "Extracts the fragment"
-        (assertEqual expected (Erl.extractFragment input))
+      test "Extracts the hash"
+        (assertEqual expected (Erl.extractHash input))
   in
-    suite "Fragment"
+    suite "Hash"
       (List.map run inputs)
 
 testFragment =
@@ -193,10 +193,10 @@ testFragment =
         ("#/us%2Fers/1", ["us/ers", "1"])
       ]
     run (input, expected) =
-      test "Parses the fragment"
-        (assertEqual expected (Erl.parse input).fragment)
+      test "Parses the hash"
+        (assertEqual expected (Erl.parse input).hash)
   in
-    suite "Fragment"
+    suite "Hash"
       (List.map run inputs)
 
 -- QUERY
@@ -241,7 +241,7 @@ testToString =
         host = ["www", "foo", "com"],
         path = ["users", "1"],
         port' = 2000,
-        fragment = ["a", "b"],
+        hash = ["a", "b"],
         query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
       }
     url2 =
@@ -252,7 +252,7 @@ testToString =
         host = [],
         port' = 0,
         path = [],
-        fragment = ["a", "b"],
+        hash = ["a", "b"],
         query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
       }
     inputs = 
@@ -260,14 +260,14 @@ testToString =
         (url1, "http://www.foo.com:2000/users/1#a/b?k=2&q=1"),
         ({url1 | protocol = ""}, "www.foo.com:2000/users/1#a/b?k=2&q=1"),
         ({url1 | port' = 80}, "http://www.foo.com/users/1#a/b?k=2&q=1"),
-        ({url1 | fragment = []}, "http://www.foo.com:2000/users/1?k=2&q=1"),
+        ({url1 | hash = []}, "http://www.foo.com:2000/users/1?k=2&q=1"),
         ({url1 | query = Dict.empty}, "http://www.foo.com:2000/users/1#a/b"),
         -- encodes values in host
         ({url1 | host = ["aa/bb", "com"]}, "http://aa%2Fbb.com:2000/users/1#a/b?k=2&q=1"),
         -- encodes values in path
         ({url1 | path = ["aa/bb", "2"]}, "http://www.foo.com:2000/aa%2Fbb/2#a/b?k=2&q=1"),
-        -- encodes values in fragment
-        ({url1 | fragment = ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1#aa%2Fbb/2?k=2&q=1"),
+        -- encodes values in hash
+        ({url1 | hash = ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1#aa%2Fbb/2?k=2&q=1"),
         -- encodes values in query
         ({url1 | query = Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1#a/b?a%2Fb=c%2Fd"),
         ({url1 | host = ["localhost"]}, "http://localhost:2000/users/1#a/b?k=2&q=1"),
@@ -307,7 +307,7 @@ testNew =
         host = [],
         port' = 0,
         path = [],
-        fragment = [],
+        hash = [],
         query = Dict.empty
       }
     actual =
@@ -362,7 +362,7 @@ all =
   suite "Tests"
     [ 
       testFragment,
-      testFragmentExtract,
+      testHashExtract,
       testHost,
       testHostExtract,
       testNew,

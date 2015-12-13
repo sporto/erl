@@ -19,13 +19,15 @@ Erl.parse url
   host: ["api", "example", "com"],
   port': 3000,
   path: ["products", "kids"],
-  fragment: ["toys", "1"],
+  hash: ["toys", "1"],
   query: Dict {
     "color": "red",
     "age": "10"
   }
 }
 ```
+
+See MDN for more details (https://developer.mozilla.org/en-US/docs/Web/API/Location). Note that in MDN `query` is called `search`.
 
 ## Construct
 
@@ -53,8 +55,8 @@ url =
 -- Modify path
 {url | path <- ["users", "1"] }
 
--- Modify fragment (hash)
-{url | fragment <- ["!", "user", "1"] }
+-- Modify hash
+{url | hash <- ["!", "user", "1"] }
 
 -- Clear query string
 Erl.clearQuery url
@@ -95,3 +97,7 @@ npm test
 - Username
 - Password
 - Maybe more convenience methods for updating parts
+
+## Changelog
+
+`5.0.0` Renamed `fragment` to `hash` to aling with the MDN documentation better

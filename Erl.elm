@@ -1,6 +1,6 @@
 module Erl (
   clearQuery,
-  extractFragment,
+  extractHash,
   extractHost,
   extractPath, 
   extractPort,
@@ -24,7 +24,7 @@ module Erl (
 @docs parse
 
 # Parse helpers
-@docs extractFragment, extractHost, extractPath, extractProtocol, extractPort, extractQuery
+@docs extractHash, extractHost, extractPath, extractProtocol, extractPort, extractQuery
 
 # Construct
 @docs new, toString
@@ -54,7 +54,7 @@ type alias Url = {
   host: List String,
   port': Int,
   path: List String,
-  fragment: List String,
+  hash: List String,
   query: Query
 }
 
@@ -232,11 +232,11 @@ pathFromAll str =
 
 -- FRAGMENT
 
-{-| Extract the fragment (hash) from the url
+{-| Extract the hash (hash) from the url
 
 -}
-extractFragment: String -> String
-extractFragment str =
+extractHash: String -> String
+extractHash str =
   str
     |> split "#"
     |> List.drop 1
@@ -246,16 +246,16 @@ extractFragment str =
     |> List.head
     |> Maybe.withDefault ""
 
-parseFragment: String -> List String
-parseFragment str =
+parseHash: String -> List String
+parseHash str =
   str
     |> split "/"
     |> List.filter notEmpty
     |> List.map Http.uriDecode
 
-fragmentFromAll: String -> List String
-fragmentFromAll str =
-  parseFragment (extractFragment str)
+hashFromAll: String -> List String
+hashFromAll str =
+  parseHash (extractHash str)
 
 -- QUERY
 
@@ -317,7 +317,7 @@ parse: String -> Url
 parse str =
   {
     host = (host str),
-    fragment = (fragmentFromAll str),
+    hash = (hashFromAll str),
     password = "",
     path = (pathFromAll str),
     port' = (extractPort str),
@@ -372,13 +372,13 @@ pathComponent url =
     else
       "/" ++ (join "/" encoded)
 
-fragmentComponent: Url -> String
-fragmentComponent url =
+hashComponent: Url -> String
+hashComponent url =
   let
     encoded =
-      List.map Http.uriEncode url.fragment
+      List.map Http.uriEncode url.hash
   in
-    case url.fragment of
+    case url.hash of
       [] -> ""
       _ ->
         "#" ++ (join "/" encoded)
@@ -401,7 +401,7 @@ queryComponent url =
       host = [],
       path = [],
       port' = 0,
-      fragment = [],
+      hash = [],
       query = Dict.empty
     }
 
@@ -415,7 +415,7 @@ new =
     host = [],
     path = [],
     port' = 0,
-    fragment = [],
+    hash = [],
     query = Dict.empty
   }
 
@@ -460,7 +460,7 @@ unsetQuery key url =
       host = ["www", "foo", "com"],
       path = ["users", "1"],
       port' = 2000,
-      fragment = ["a", "b"],
+      hash = ["a", "b"],
       query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
     }
 
@@ -478,11 +478,11 @@ toString url =
       portComponent url
     path' =
       pathComponent url
-    fragment' =
-      fragmentComponent url
+    hash =
+      hashComponent url
     query' =
       queryComponent url
   in
-    protocol' ++ host' ++ port' ++ path' ++ fragment' ++ query'
+    protocol' ++ host' ++ port' ++ path' ++ hash ++ query'
 
 
