@@ -252,8 +252,8 @@ testToString =
         host = [],
         port' = 0,
         path = [],
-        hash = ["a", "b"],
-        query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
+        hash = [],
+        query = Dict.empty
       }
     inputs = 
       [
@@ -271,7 +271,8 @@ testToString =
         -- encodes values in query
         ({url1 | query = Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1#a/b?a%2Fb=c%2Fd"),
         ({url1 | host = ["localhost"]}, "http://localhost:2000/users/1#a/b?k=2&q=1"),
-        (url2, "#a/b?k=2&q=1")
+        ({url2 | hash = ["a", "b"], query = Dict.singleton "k" "1"}, "#a/b?k=1"),
+        ({url2 | query = Dict.singleton "k" "1"}, "?k=1")
       ]
     run (input, expected) =
       test "Generates the url"
