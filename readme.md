@@ -100,4 +100,5 @@ npm test
 
 ## Changelog
 
+`5.0.1` SetQuery removes the key when passed an empty value
 `5.0.0` Renamed `fragment` to `hash` to aling with the MDN documentation better
