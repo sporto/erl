@@ -317,44 +317,63 @@ testNew =
     test "Generates an empty url"
       (assertEqual expected actual)
 
+testAddQuery =
+  let
+    inputs =
+      [
+        (
+          Erl.new
+            |> Erl.addQuery "a" "1"
+            |> Erl.addQuery "b" "2"
+            |> .query
+          , Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2"
+        ),
+        (
+          Erl.new
+            |> Erl.addQuery "a" "1"
+            |> Erl.addQuery "a" ""
+            |> .query
+          , Dict.empty
+        )
+      ]
+    run (actual, expected) =
+      test "addQuery"
+        (assertEqual expected actual)
+  in
+    suite "Adds to the query"
+      (List.map run inputs)
+
 testSetQuery =
   let
     inputs =
       [
         (
           Erl.new
-            |> Erl.setQuery "a" "1"
+            |> Erl.addQuery "a" "1"
             |> Erl.setQuery "b" "2"
             |> .query
-          , Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2"
-        ),
-        (
-          Erl.new
-            |> Erl.setQuery "a" "1"
-            |> Erl.setQuery "a" ""
-            |> .query
-          , Dict.empty
+          , Dict.singleton "b" "2"
         )
       ]
     run (actual, expected) =
-      test "querySet"
+      test "setQuery"
         (assertEqual expected actual)
   in
     suite "Sets the query"
       (List.map run inputs)
 
-unsetQuery =
+testRemoveQuery =
   let
     expected =
       Dict.empty |> Dict.insert "a" "1"
     actual =
       Erl.new
-        |> Erl.setQuery "a" "1"
-        |> Erl.setQuery "b" "2"
-        |> Erl.unsetQuery "b"
+        |> Erl.addQuery "a" "1"
+        |> Erl.addQuery "b" "2"
+        |> Erl.removeQuery "b"
         |> .query
   in
-    test "Unsets the query"
+    test "Removes the query"
       (assertEqual expected actual)
 
 testQueryClear =
@@ -390,7 +409,8 @@ all =
       testQueryClear,
       testQueryExtract,
       testSetQuery,
-      unsetQuery,
       testRoundTrips,
-      testToString
+      testAddQuery,
+      testToString,
+      testRemoveQuery
     ]

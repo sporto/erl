@@ -1,4 +1,5 @@
 module Erl (
+  addQuery,
   clearQuery,
   extractHash,
   extractHost,
@@ -8,7 +9,7 @@ module Erl (
   extractQuery,
   new,
   parse,
-  unsetQuery,
+  removeQuery,
   setQuery,
   toString,
   Url,
@@ -30,7 +31,7 @@ module Erl (
 @docs new, toString
 
 # Mutation helpers
-@docs clearQuery, unsetQuery, setQuery
+@docs addQuery, setQuery, removeQuery, clearQuery
 
 -}
 
@@ -429,10 +430,10 @@ clearQuery url =
 
 {-| Set key/value in query string
     
-    Erl.setQuery key value url
+    Erl.addQuery key value url
 -}
-setQuery: String -> String -> Url -> Url
-setQuery key val url =
+addQuery: String -> String -> Url -> Url
+addQuery key val url =
   let
     updated =
       if String.isEmpty val then
@@ -442,12 +443,24 @@ setQuery key val url =
   in
     {url | query = updated }
 
+{-| Set key/value in query string, removes any existing ones
+    
+    Erl.setQuery key value url
+-}
+setQuery: String -> String -> Url -> Url
+setQuery key val url =
+  let
+    updated =
+      Dict.singleton key val
+  in
+    {url | query = updated }
+
 {-| Removes key from query string
     
-    Erl.unsetQuery key url
+    Erl.removeQuery key url
 -}
-unsetQuery: String -> Url -> Url
-unsetQuery key url =
+removeQuery: String -> Url -> Url
+removeQuery key url =
   let
     updated =
       Dict.remove key url.query

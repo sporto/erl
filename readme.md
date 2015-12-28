@@ -61,11 +61,14 @@ url =
 -- Clear query string
 Erl.clearQuery url
 
--- Set query string key/value
-Erl.setQuery "key" "value" url
+-- Add one query string key/value (patches previous query string)
+Erl.addQuery "key" "value" url
 
--- Unset query string key/value
-Erl.unsetQuery "key" url
+-- Remove one query string key/value
+Erl.removeQuery "key" url
+
+-- Replaces query string with key/value (removes any previous keys)
+Erl.setQuery "key" "value" url
 ```
 
 ### `toString`
