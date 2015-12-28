@@ -435,7 +435,10 @@ setQuery: String -> String -> Url -> Url
 setQuery key val url =
   let
     updated =
-      Dict.insert key val url.query
+      if String.isEmpty val then
+        Dict.remove key url.query
+      else
+        Dict.insert key val url.query
   in
     {url | query = updated }
 

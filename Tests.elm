@@ -317,20 +317,33 @@ testNew =
     test "Generates an empty url"
       (assertEqual expected actual)
 
-testQuerySet =
+testSetQuery =
   let
-    expected =
-      Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2"
-    actual =
-      Erl.new
-        |> Erl.setQuery "a" "1"
-        |> Erl.setQuery "b" "2"
-        |> .query
+    inputs =
+      [
+        (
+          Erl.new
+            |> Erl.setQuery "a" "1"
+            |> Erl.setQuery "b" "2"
+            |> .query
+          , Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2"
+        ),
+        (
+          Erl.new
+            |> Erl.setQuery "a" "1"
+            |> Erl.setQuery "a" ""
+            |> .query
+          , Dict.empty
+        )
+      ]
+    run (actual, expected) =
+      test "querySet"
+        (assertEqual expected actual)
   in
-    test "Sets the query"
-      (assertEqual expected actual)
+    suite "Sets the query"
+      (List.map run inputs)
 
-testQueryUnset =
+unsetQuery =
   let
     expected =
       Dict.empty |> Dict.insert "a" "1"
@@ -376,8 +389,8 @@ all =
       testQuery,
       testQueryClear,
       testQueryExtract,
-      testQuerySet,
-      testQueryUnset,
+      testSetQuery,
+      unsetQuery,
       testRoundTrips,
       testToString
     ]
