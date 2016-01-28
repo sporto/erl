@@ -103,7 +103,7 @@ npm test
 
 ## Changelog
 
-`7.0.0` Hash goes after query as per https://url.spec.whatwg.org/
-`6.0.0` `setQuery` replaces the whole query, Added `addQuery` and `removeQuery`
-`5.0.1` `setQuery` removes the key when passed an empty value
-`5.0.0` Renamed `fragment` to `hash` to aling with the MDN documentation better
+- `7.0.0` Hash goes after query as per https://url.spec.whatwg.org/
+- `6.0.0` `setQuery` replaces the whole query, Added `addQuery` and `removeQuery`
+- `5.0.1` `setQuery` removes the key when passed an empty value
+- `5.0.0` Renamed `fragment` to `hash` to aling with the MDN documentation better
