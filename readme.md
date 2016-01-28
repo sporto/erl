@@ -55,6 +55,9 @@ url =
 -- Modify path
 {url | path <- ["users", "1"] }
 
+-- Modify path (equivalent to above)
+Erl.appendPathSegments url ["users", "1"]
+
 -- Modify hash
 {url | hash <- ["!", "user", "1"] }
 
