@@ -6,7 +6,7 @@ A URL parsing and construction library for ELM
 
 ```elm
 -- Given a url string
-url = "http://sam:pass@api.example.com:3000/products/kids#toys/1?color=red&age=10"
+url = "http://sam:pass@api.example.com:3000/products/kids?color=red&age=10#toys/1"
 
 Erl.parse url 
 
@@ -80,7 +80,7 @@ Erl.toString url
 
 -- Returns the url as string:
 
-"http://www.foo.com:2000/users/1#a/b?k=2&q=1"
+"http://www.foo.com:2000/users/1?k=2&q=1#a/b"
 ```
 
 ## Documentation
@@ -103,6 +103,7 @@ npm test
 
 ## Changelog
 
+`7.0.0` Hash goes after query as per https://url.spec.whatwg.org/
 `6.0.0` `setQuery` replaces the whole query, Added `addQuery` and `removeQuery`
 `5.0.1` `setQuery` removes the key when passed an empty value
 `5.0.0` Renamed `fragment` to `hash` to aling with the MDN documentation better
