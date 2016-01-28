@@ -11,6 +11,8 @@ module Erl (
   parse,
   removeQuery,
   setQuery,
+  mapPath,
+  appendPathSegments,
   toString,
   Url,
   Query
@@ -31,7 +33,7 @@ module Erl (
 @docs new, toString
 
 # Mutation helpers
-@docs addQuery, setQuery, removeQuery, clearQuery
+@docs addQuery, setQuery, removeQuery, clearQuery, mapPath, appendPathSegments
 
 -}
 
@@ -466,6 +468,27 @@ removeQuery key url =
       Dict.remove key url.query
   in
     {url | query = updated }
+
+{-| Transform a url's path with a function
+    
+    Erl.mapPath f url
+-}
+mapPath: (List String -> List String) -> Url -> Url
+mapPath f url =
+  let
+    updated =
+      f (url.path)
+  in
+    {url | path = updated }
+
+{-| Append some path segments to a url
+    
+    Erl.appendPathSegments segments url
+-}
+appendPathSegments: (List String) -> Url -> Url
+appendPathSegments segments =
+  mapPath (\oldSegments -> oldSegments ++ segments)
+
 
 {-| Generate url string from an Erl.Url record
 
