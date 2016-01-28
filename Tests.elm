@@ -167,6 +167,41 @@ testPath =
     suite "Path"
       (List.map run inputs)
 
+testMapPath: Test
+testMapPath =
+  let
+    f segments = ["start"] ++ segments ++ ["end"]
+    inputs =
+      [
+        ("http://foo.com/users/index.html?a=1", ["start", "users", "index.html", "end"]),
+        ("/", ["start", "end"])
+      ]
+    run (input, expected) =
+      test "Transforms the path"
+        (assertEqual expected (Erl.mapPath f (Erl.parse input)).path)
+  in
+    suite "mapPath"
+      (List.map run inputs)
+
+testAppendPathSegments: Test
+testAppendPathSegments =
+  let
+    inputs =
+      [
+        ("http://foo.com/users/index.html?a=1", ["extra"], ["users", "index.html", "extra"]),
+        ("/", [], []),
+        ("/zero", ["one", "two"], ["zero", "one", "two"])
+      ]
+    run (inputUrl, inputPathSegments, expected) =
+      test "Appends segments to the path"
+        (assertEqual expected (Erl.appendPathSegments inputPathSegments (Erl.parse inputUrl)).path)
+  in
+    suite "appendPathSegments"
+      (List.map run inputs)
+
+
+
+
 -- FRAGMENT
 
 testHashExtract =
@@ -402,6 +437,8 @@ all =
       testNew,
       testPath,
       testPathExtract,
+      testMapPath,
+      testAppendPathSegments,
       testPort,
       testPortExtract,
       testProtocol,
