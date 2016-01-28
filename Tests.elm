@@ -174,7 +174,7 @@ testHashExtract =
     inputs =
       [
         ("#/users/1", "/users/1"),
-        ("www.foo.com/hello#/users/1?a=1", "/users/1")
+        ("www.foo.com/hello?a=1#/users/1", "/users/1")
       ]
     run (input, expected) =
       test "Extracts the hash"
@@ -183,12 +183,12 @@ testHashExtract =
     suite "Hash"
       (List.map run inputs)
 
-testFragment =
+testHash =
   let
     inputs =
       [
         ("#/users/1", ["users", "1"]),
-        ("www.foo.com#/users/1?a=1", ["users", "1"]),
+        ("www.foo.com?a=1#/users/1", ["users", "1"]),
         -- it decodes
         ("#/us%2Fers/1", ["us/ers", "1"])
       ]
@@ -205,7 +205,8 @@ testQueryExtract =
   let
     inputs =
       [
-        ("http://foo.com/users?a=1", "a=1")
+        ("http://foo.com/users?a=1", "a=1"),
+        ("http://foo.com/users?a=1#/users", "a=1")
       ]
     run (input, expected) =
       test "Extracts the query"
@@ -257,21 +258,21 @@ testToString =
       }
     inputs = 
       [
-        (url1, "http://www.foo.com:2000/users/1#a/b?k=2&q=1"),
-        ({url1 | protocol = ""}, "www.foo.com:2000/users/1#a/b?k=2&q=1"),
-        ({url1 | port' = 80}, "http://www.foo.com/users/1#a/b?k=2&q=1"),
+        (url1, "http://www.foo.com:2000/users/1?k=2&q=1#a/b"),
+        ({url1 | protocol = ""}, "www.foo.com:2000/users/1?k=2&q=1#a/b"),
+        ({url1 | port' = 80}, "http://www.foo.com/users/1?k=2&q=1#a/b"),
         ({url1 | hash = []}, "http://www.foo.com:2000/users/1?k=2&q=1"),
         ({url1 | query = Dict.empty}, "http://www.foo.com:2000/users/1#a/b"),
         -- encodes values in host
-        ({url1 | host = ["aa/bb", "com"]}, "http://aa%2Fbb.com:2000/users/1#a/b?k=2&q=1"),
+        ({url1 | host = ["aa/bb", "com"]}, "http://aa%2Fbb.com:2000/users/1?k=2&q=1#a/b"),
         -- encodes values in path
-        ({url1 | path = ["aa/bb", "2"]}, "http://www.foo.com:2000/aa%2Fbb/2#a/b?k=2&q=1"),
+        ({url1 | path = ["aa/bb", "2"]}, "http://www.foo.com:2000/aa%2Fbb/2?k=2&q=1#a/b"),
         -- encodes values in hash
-        ({url1 | hash = ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1#aa%2Fbb/2?k=2&q=1"),
+        ({url1 | hash = ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1?k=2&q=1#aa%2Fbb/2"),
         -- encodes values in query
-        ({url1 | query = Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1#a/b?a%2Fb=c%2Fd"),
-        ({url1 | host = ["localhost"]}, "http://localhost:2000/users/1#a/b?k=2&q=1"),
-        ({url2 | hash = ["a", "b"], query = Dict.singleton "k" "1"}, "#a/b?k=1"),
+        ({url1 | query = Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1?a%2Fb=c%2Fd#a/b"),
+        ({url1 | host = ["localhost"]}, "http://localhost:2000/users/1?k=2&q=1#a/b"),
+        ({url2 | hash = ["a", "b"], query = Dict.singleton "k" "1"}, "?k=1#a/b"),
         ({url2 | query = Dict.singleton "k" "1"}, "?k=1")
       ]
     run (input, expected) =
@@ -289,7 +290,7 @@ testRoundTrips =
         "http://example.com:2000",
         "http://example.com/users/1",
         "http://example.com/users/1?color=red",
-        "http://example.com/users/1#a/b?color=red"
+        "http://example.com/users/1?color=red#a/b"
       ]
     run (input) =
       test "Round trip"
@@ -394,7 +395,7 @@ all: Test
 all = 
   suite "Tests"
     [ 
-      testFragment,
+      testHash,
       testHashExtract,
       testHost,
       testHostExtract,

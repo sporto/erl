@@ -243,9 +243,6 @@ extractHash str =
     |> List.drop 1
     |> List.head
     |> Maybe.withDefault ""
-    |> split "?"
-    |> List.head
-    |> Maybe.withDefault ""
 
 parseHash: String -> List String
 parseHash str =
@@ -265,11 +262,14 @@ hashFromAll str =
 -}
 extractQuery: String -> String
 extractQuery str =
-  let
-    parts = split "?" str
-    maybeFirst = List.head (List.drop 1 parts)
-  in
-    Maybe.withDefault "" maybeFirst
+  str
+    |> split "?"
+    |> List.drop 1
+    |> List.head
+    |> Maybe.withDefault ""
+    |> split "#"
+    |> List.head
+    |> Maybe.withDefault ""
 
 -- "a=1" --> ("a", "1")
 queryStringElementToTuple: String -> (String, String)
@@ -494,11 +494,11 @@ toString url =
       portComponent url
     path' =
       pathComponent url
-    hash =
-      hashComponent url
     query' =
       queryComponent url
+    hash =
+      hashComponent url
   in
-    protocol' ++ host' ++ port' ++ path' ++ hash ++ query'
+    protocol' ++ host' ++ port' ++ path' ++ query' ++ hash
 
 
