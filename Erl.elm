@@ -336,7 +336,7 @@ parse str =
   }
 
 -- TO STRING
-{-| Convert to a string only the query of an url
+{-| Convert to a string only the query of an url, this doesn't include ?
 
     Erl.queryToString url == "a=1&b=2"
 -}

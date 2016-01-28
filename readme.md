@@ -106,6 +106,8 @@ npm test
 
 ## Changelog
 
+- `7.2.0` Added `queryToString`
+- `7.1.0` Added `appendPathSegments`
 - `7.0.0` Hash goes after query as per https://url.spec.whatwg.org/
 - `6.0.0` `setQuery` replaces the whole query, Added `addQuery` and `removeQuery`
 - `5.0.1` `setQuery` removes the key when passed an empty value
