@@ -13,6 +13,7 @@ module Erl (
   setQuery,
   appendPathSegments,
   toString,
+  queryToString,
   Url,
   Query
   ) where
@@ -29,10 +30,16 @@ module Erl (
 @docs extractHash, extractHost, extractPath, extractProtocol, extractPort, extractQuery
 
 # Construct
-@docs new, toString
+@docs new
 
 # Mutation helpers
 @docs addQuery, setQuery, removeQuery, clearQuery, appendPathSegments
+
+# Serialize
+@docs toString
+
+# Serialization helpers
+@docs queryToString
 
 -}
 
@@ -329,12 +336,15 @@ parse str =
   }
 
 -- TO STRING
+{-| Convert to a string only the query of an url
 
-queryToString: Query -> String
-queryToString query =
+    Erl.queryToString url == "a=1&b=2"
+-}
+queryToString: Url -> String
+queryToString url =
   let
     tuples =
-      Dict.toList query
+      Dict.toList url.query
     encodedTuples =
       List.map (\(x, y) -> (Http.uriEncode x, Http.uriEncode y)) tuples
     parts =
@@ -390,7 +400,7 @@ queryComponent url =
   case Dict.isEmpty url.query of
     True -> ""
     False ->
-      "?" ++ (queryToString url.query)
+      "?" ++ (queryToString url)
 
 {-| Generate an empty Erl.Url record
 

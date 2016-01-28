@@ -254,6 +254,24 @@ testQuery =
     suite "Query"
       (List.map run inputs)
 
+testQueryToString =
+  let
+    inputs =
+      [
+        ("http://foo.com/a/?a=1&b=2#hash", "a=1&b=2"),
+        ("http://foo.com/a/#hash", "")
+      ]
+    run (input, expected) =
+      let
+        url =
+          Erl.parse input
+        actual =
+          Erl.queryToString url
+      in
+        test "queryToString"
+          (assertEqual expected actual)
+  in
+    suite "queryToString" (List.map run inputs)
 
 -- TO STRING
 
@@ -436,6 +454,7 @@ all =
       testQuery,
       testQueryClear,
       testQueryExtract,
+      testQueryToString,
       testRemoveQuery,
       testRoundTrips,
       testSetQuery,
