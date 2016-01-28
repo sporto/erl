@@ -1,5 +1,5 @@
 {
-    "version": "6.1.0",
+    "version": "7.0.0",
     "summary": "Parse and construct URLs",
     "repository": "https://github.com/sporto/erl.git",
     "license": "MIT",
