@@ -167,22 +167,6 @@ testPath =
     suite "Path"
       (List.map run inputs)
 
-testMapPath: Test
-testMapPath =
-  let
-    f segments = ["start"] ++ segments ++ ["end"]
-    inputs =
-      [
-        ("http://foo.com/users/index.html?a=1", ["start", "users", "index.html", "end"]),
-        ("/", ["start", "end"])
-      ]
-    run (input, expected) =
-      test "Transforms the path"
-        (assertEqual expected (Erl.mapPath f (Erl.parse input)).path)
-  in
-    suite "mapPath"
-      (List.map run inputs)
-
 testAppendPathSegments: Test
 testAppendPathSegments =
   let
@@ -193,8 +177,14 @@ testAppendPathSegments =
         ("/zero", ["one", "two"], ["zero", "one", "two"])
       ]
     run (inputUrl, inputPathSegments, expected) =
-      test "Appends segments to the path"
-        (assertEqual expected (Erl.appendPathSegments inputPathSegments (Erl.parse inputUrl)).path)
+      let
+        inputUrlAsUrl =
+          Erl.parse inputUrl
+        actual =
+          (Erl.appendPathSegments inputPathSegments inputUrlAsUrl).path
+      in
+        test "Appends segments to the path"
+          (assertEqual expected actual)
   in
     suite "appendPathSegments"
       (List.map run inputs)
@@ -430,6 +420,8 @@ all: Test
 all = 
   suite "Tests"
     [ 
+      testAddQuery,
+      testAppendPathSegments,
       testHash,
       testHashExtract,
       testHost,
@@ -437,8 +429,6 @@ all =
       testNew,
       testPath,
       testPathExtract,
-      testMapPath,
-      testAppendPathSegments,
       testPort,
       testPortExtract,
       testProtocol,
@@ -446,9 +436,8 @@ all =
       testQuery,
       testQueryClear,
       testQueryExtract,
-      testSetQuery,
+      testRemoveQuery,
       testRoundTrips,
-      testAddQuery,
-      testToString,
-      testRemoveQuery
+      testSetQuery,
+      testToString
     ]
