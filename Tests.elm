@@ -258,7 +258,7 @@ testQueryToString =
   let
     inputs =
       [
-        ("http://foo.com/a/?a=1&b=2#hash", "a=1&b=2"),
+        ("http://foo.com/a/?a=1&b=2#hash", "?a=1&b=2"),
         ("http://foo.com/a/#hash", "")
       ]
     run (input, expected) =
@@ -272,6 +272,26 @@ testQueryToString =
           (assertEqual expected actual)
   in
     suite "queryToString" (List.map run inputs)
+
+testHashToString =
+  let
+    inputs =
+      [
+        ("http://foo.com/a/?a=1&b=2#hash", "#hash"),
+        ("http://foo.com/a/#a/b", "#a/b"),
+        ("http://foo.com/a?foo=1", "")
+      ]
+    run (input, expected) =
+      let
+        url =
+          Erl.parse input
+        actual =
+          Erl.hashToString url
+      in
+        test "hashToString"
+          (assertEqual expected actual)
+  in
+    suite "hashToString" (List.map run inputs)
 
 -- TO STRING
 
@@ -442,6 +462,7 @@ all =
       testAppendPathSegments,
       testHash,
       testHashExtract,
+      testHashToString,
       testHost,
       testHostExtract,
       testNew,

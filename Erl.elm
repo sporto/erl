@@ -14,6 +14,7 @@ module Erl (
   appendPathSegments,
   toString,
   queryToString,
+  hashToString,
   Url,
   Query
   ) where
@@ -39,7 +40,7 @@ module Erl (
 @docs toString
 
 # Serialization helpers
-@docs queryToString
+@docs queryToString, hashToString
 
 -}
 
@@ -336,9 +337,9 @@ parse str =
   }
 
 -- TO STRING
-{-| Convert to a string only the query of an url, this doesn't include ?
+{-| Convert to a string only the query component of an url, this includes '?'
 
-    Erl.queryToString url == "a=1&b=2"
+    Erl.queryToString url == "?a=1&b=2"
 -}
 queryToString: Url -> String
 queryToString url =
@@ -350,7 +351,10 @@ queryToString url =
     parts =
       List.map (\(a, b) -> a ++ "=" ++ b) encodedTuples
   in
-    join "&" parts
+    if Dict.isEmpty url.query then
+      ""
+    else
+      "?" ++ (join "&" parts)
 
 protocolComponent: Url -> String
 protocolComponent url =
@@ -384,8 +388,12 @@ pathComponent url =
     else
       "/" ++ (join "/" encoded)
 
-hashComponent: Url -> String
-hashComponent url =
+{-| Convert to a string only the hash component of an url, this includes '#'
+
+    Erl.queryToString url == "#a/b"
+-}
+hashToString: Url -> String
+hashToString url =
   let
     encoded =
       List.map Http.uriEncode url.hash
@@ -394,13 +402,6 @@ hashComponent url =
       [] -> ""
       _ ->
         "#" ++ (join "/" encoded)
-
-queryComponent: Url -> String
-queryComponent url =
-  case Dict.isEmpty url.query of
-    True -> ""
-    False ->
-      "?" ++ (queryToString url)
 
 {-| Generate an empty Erl.Url record
 
@@ -518,9 +519,9 @@ toString url =
     path' =
       pathComponent url
     query' =
-      queryComponent url
+      queryToString url
     hash =
-      hashComponent url
+      hashToString url
   in
     protocol' ++ host' ++ port' ++ path' ++ query' ++ hash
 
