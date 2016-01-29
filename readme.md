@@ -106,6 +106,7 @@ npm test
 
 ## Changelog
 
+- `7.3.0` Added `hashToString`
 - `7.2.0` Added `queryToString`
 - `7.1.0` Added `appendPathSegments`
 - `7.0.0` Hash goes after query as per https://url.spec.whatwg.org/
