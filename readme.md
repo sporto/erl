@@ -106,6 +106,7 @@ npm test
 
 ## Changelog
 
+- `8.0.0` `hash` is a string, not a list anymore
 - `7.3.0` Added `hashToString`
 - `7.2.0` Added `queryToString`
 - `7.1.0` Added `appendPathSegments`
