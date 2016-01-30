@@ -14,7 +14,6 @@ module Erl (
   appendPathSegments,
   toString,
   queryToString,
-  hashToString,
   Url,
   Query
   ) where
@@ -40,7 +39,7 @@ module Erl (
 @docs toString
 
 # Serialization helpers
-@docs queryToString, hashToString
+@docs queryToString
 
 -}
 
@@ -64,7 +63,7 @@ type alias Url = {
   host: List String,
   port': Int,
   path: List String,
-  hash: List String,
+  hash: String,
   query: Query
 }
 
@@ -253,16 +252,9 @@ extractHash str =
     |> List.head
     |> Maybe.withDefault ""
 
-parseHash: String -> List String
-parseHash str =
-  str
-    |> split "/"
-    |> List.filter notEmpty
-    |> List.map Http.uriDecode
-
-hashFromAll: String -> List String
+hashFromAll: String -> String
 hashFromAll str =
-  parseHash (extractHash str)
+  extractHash str
 
 -- QUERY
 
@@ -388,20 +380,16 @@ pathComponent url =
     else
       "/" ++ (join "/" encoded)
 
-{-| Convert to a string only the hash component of an url, this includes '#'
+{-| Convert to a string the hash component of an url, this includes '#'
 
-    Erl.queryToString url == "#a/b"
+    queryToString url == "#a/b"
 -}
 hashToString: Url -> String
 hashToString url =
-  let
-    encoded =
-      List.map Http.uriEncode url.hash
-  in
-    case url.hash of
-      [] -> ""
-      _ ->
-        "#" ++ (join "/" encoded)
+  if String.isEmpty url.hash then
+    ""
+  else
+    "#" ++ url.hash
 
 {-| Generate an empty Erl.Url record
 
@@ -414,7 +402,7 @@ hashToString url =
       host = [],
       path = [],
       port' = 0,
-      hash = [],
+      hash = "",
       query = Dict.empty
     }
 
@@ -428,7 +416,7 @@ new =
     host = [],
     path = [],
     port' = 0,
-    hash = [],
+    hash = "",
     query = Dict.empty
   }
 
@@ -500,11 +488,11 @@ appendPathSegments segments url =
       host = ["www", "foo", "com"],
       path = ["users", "1"],
       port' = 2000,
-      hash = ["a", "b"],
+      hash = "a/b",
       query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
     }
 
-    Erl.toString url == "http://www.foo.com:2000/users/1#a/b?k=2&q=1"
+    Erl.toString url == "http://www.foo.com:2000/users/1?k=2&q=1#a/b"
 
 -}
 toString: Url -> String

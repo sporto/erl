@@ -189,9 +189,6 @@ testAppendPathSegments =
     suite "appendPathSegments"
       (List.map run inputs)
 
-
-
-
 -- FRAGMENT
 
 testHashExtract =
@@ -212,14 +209,30 @@ testHash =
   let
     inputs =
       [
-        ("#/users/1", ["users", "1"]),
-        ("www.foo.com?a=1#/users/1", ["users", "1"]),
-        -- it decodes
-        ("#/us%2Fers/1", ["us/ers", "1"])
+        (
+          "it parses a hash by itself",
+          "#/users/1",
+          "/users/1"
+        ),
+        (
+          "it parses a hash as part of an url",
+          "www.foo.com?a=1#/users/1",
+          "/users/1"
+        ),
+        (
+          "it keeps the encoding",
+          "#/us%2Fers/1",
+          "/us%2Fers/1"
+        )
       ]
-    run (input, expected) =
-      test "Parses the hash"
-        (assertEqual expected (Erl.parse input).hash)
+    run (testCase, input, expected) =
+      let 
+        actual =
+          (Erl.parse input).hash
+        result =
+          assertEqual expected actual
+      in
+        test testCase result
   in
     suite "Hash"
       (List.map run inputs)
@@ -273,26 +286,6 @@ testQueryToString =
   in
     suite "queryToString" (List.map run inputs)
 
-testHashToString =
-  let
-    inputs =
-      [
-        ("http://foo.com/a/?a=1&b=2#hash", "#hash"),
-        ("http://foo.com/a/#a/b", "#a/b"),
-        ("http://foo.com/a?foo=1", "")
-      ]
-    run (input, expected) =
-      let
-        url =
-          Erl.parse input
-        actual =
-          Erl.hashToString url
-      in
-        test "hashToString"
-          (assertEqual expected actual)
-  in
-    suite "hashToString" (List.map run inputs)
-
 -- TO STRING
 
 testToString =
@@ -305,7 +298,7 @@ testToString =
         host = ["www", "foo", "com"],
         path = ["users", "1"],
         port' = 2000,
-        hash = ["a", "b"],
+        hash = "a/b",
         query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
       }
     url2 =
@@ -316,31 +309,77 @@ testToString =
         host = [],
         port' = 0,
         path = [],
-        hash = [],
+        hash = "",
         query = Dict.empty
       }
     inputs = 
       [
-        (url1, "http://www.foo.com:2000/users/1?k=2&q=1#a/b"),
-        ({url1 | protocol = ""}, "www.foo.com:2000/users/1?k=2&q=1#a/b"),
-        ({url1 | port' = 80}, "http://www.foo.com/users/1?k=2&q=1#a/b"),
-        ({url1 | hash = []}, "http://www.foo.com:2000/users/1?k=2&q=1"),
-        ({url1 | query = Dict.empty}, "http://www.foo.com:2000/users/1#a/b"),
-        -- encodes values in host
-        ({url1 | host = ["aa/bb", "com"]}, "http://aa%2Fbb.com:2000/users/1?k=2&q=1#a/b"),
-        -- encodes values in path
-        ({url1 | path = ["aa/bb", "2"]}, "http://www.foo.com:2000/aa%2Fbb/2?k=2&q=1#a/b"),
-        -- encodes values in hash
-        ({url1 | hash = ["aa/bb", "2"]}, "http://www.foo.com:2000/users/1?k=2&q=1#aa%2Fbb/2"),
-        -- encodes values in query
-        ({url1 | query = Dict.empty |> Dict.insert "a/b" "c/d" }, "http://www.foo.com:2000/users/1?a%2Fb=c%2Fd#a/b"),
-        ({url1 | host = ["localhost"]}, "http://localhost:2000/users/1?k=2&q=1#a/b"),
-        ({url2 | hash = ["a", "b"], query = Dict.singleton "k" "1"}, "?k=1#a/b"),
-        ({url2 | query = Dict.singleton "k" "1"}, "?k=1")
+        (
+          "it converts to string",
+          url1,
+          "http://www.foo.com:2000/users/1?k=2&q=1#a/b"
+        ),
+        (
+          "it can have an empty protocol",
+          {url1 | protocol = ""},
+          "www.foo.com:2000/users/1?k=2&q=1#a/b"
+        ),
+        (
+          "it doesn't include the port when it is 80",
+          {url1 | port' = 80},
+          "http://www.foo.com/users/1?k=2&q=1#a/b"
+        ),
+        (
+          "it doesn't add # when hash is empty",
+          {url1 | hash = ""},
+          "http://www.foo.com:2000/users/1?k=2&q=1"
+        ),
+        (
+          "it doesn't add query when query is empty",
+          {url1 | query = Dict.empty},
+          "http://www.foo.com:2000/users/1#a/b"
+        ),
+        -- 
+        (
+          "it encodes values in host",
+          {url1 | host = ["aa/bb", "com"]},
+          "http://aa%2Fbb.com:2000/users/1?k=2&q=1#a/b"
+        ),
+        (
+          "it encodes values in path",
+          {url1 | path = ["aa/bb", "2"]},
+          "http://www.foo.com:2000/aa%2Fbb/2?k=2&q=1#a/b"
+        ),
+        
+        (
+          "it encodes values in query",
+          {url1 | query = Dict.empty |> Dict.insert "a/b" "c/d" },
+          "http://www.foo.com:2000/users/1?a%2Fb=c%2Fd#a/b"
+        ),
+        (
+          "it handles localhost which has no .",
+          {url1 | host = ["localhost"]},
+          "http://localhost:2000/users/1?k=2&q=1#a/b"
+        ),
+        (
+          "it handles a url without host, port, path",
+          {url2 | hash = "a/b", query = Dict.singleton "k" "1"},
+          "?k=1#a/b"
+        ),
+        (
+          "it handles a url with only query",
+          {url2 | query = Dict.singleton "k" "1"},
+          "?k=1"
+        )
       ]
-    run (input, expected) =
-      test "Generates the url"
-        (assertEqual expected (Erl.toString input))
+    run (testCase, input, expected) =
+      let
+        actual =
+          Erl.toString input
+        result =
+          assertEqual expected actual
+      in
+        test testCase result
   in
     suite "toString"
       (List.map run inputs)
@@ -372,7 +411,7 @@ testNew =
         host = [],
         port' = 0,
         path = [],
-        hash = [],
+        hash = "",
         query = Dict.empty
       }
     actual =
@@ -462,7 +501,6 @@ all =
       testAppendPathSegments,
       testHash,
       testHashExtract,
-      testHashToString,
       testHost,
       testHostExtract,
       testNew,

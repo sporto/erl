@@ -19,7 +19,7 @@ Erl.parse url
   host: ["api", "example", "com"],
   port': 3000,
   path: ["products", "kids"],
-  hash: ["toys", "1"],
+  hash: "toys/1",
   query: Dict {
     "color": "red",
     "age": "10"
@@ -44,22 +44,22 @@ url =
 
 ```elm
 -- Modify the protocol
-{ url | protocol <- "https" }
+{ url | protocol = "https" }
 
 -- Modify host
-{url | host <- ["api", "acme", "com"] }
+{url | host = ["api", "acme", "com"] }
 
 -- Modify port
-{ url | port' <- 9000 }
+{ url | port' = 9000 }
 
 -- Modify path
-{url | path <- ["users", "1"] }
+{url | path = ["users", "1"] }
 
 -- Modify path (equivalent to above)
 Erl.appendPathSegments url ["users", "1"]
 
 -- Modify hash
-{url | hash <- ["!", "user", "1"] }
+{url | hash = "users/1" }
 
 -- Clear query string
 Erl.clearQuery url
