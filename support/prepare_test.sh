@@ -1,4 +1,4 @@
-# nvm install 4.0
+nvm use 4.0
 node --version
 npm --version
 npm install -g elm
