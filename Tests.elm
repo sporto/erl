@@ -166,6 +166,21 @@ testPath =
   in
     suite "Path"
       (List.map run inputs)
+      
+testHasTrailingSlash: Test
+testHasTrailingSlash =
+  let
+    inputs =
+      [
+        ("http://foo.com/users/all/?a=1", True),
+        ("http://foo.com/users/all?a=1", False)
+      ]
+    run (input, expected) =
+      test "Identifies the presence of a trailing slash"
+        (assertEqual expected (Erl.parse input).hasTrailingSlash)
+  in
+    suite "Path"
+      (List.map run inputs)
 
 testAppendPathSegments: Test
 testAppendPathSegments =
@@ -297,6 +312,7 @@ testToString =
         password = "",
         host = ["www", "foo", "com"],
         path = ["users", "1"],
+        hasTrailingSlash = False,
         port' = 2000,
         hash = "a/b",
         query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
@@ -309,6 +325,7 @@ testToString =
         host = [],
         port' = 0,
         path = [],
+        hasTrailingSlash = False,
         hash = "",
         query = Dict.empty
       }
@@ -318,6 +335,11 @@ testToString =
           "it converts to string",
           url1,
           "http://www.foo.com:2000/users/1?k=2&q=1#a/b"
+        ),
+        (
+          "it can have a trailing slash",
+          {url1 | hasTrailingSlash = True},
+          "http://www.foo.com:2000/users/1/?k=2&q=1#a/b"
         ),
         (
           "it can have an empty protocol",
@@ -411,6 +433,7 @@ testNew =
         host = [],
         port' = 0,
         path = [],
+        hasTrailingSlash = False,
         hash = "",
         query = Dict.empty
       }
@@ -506,6 +529,7 @@ all =
       testNew,
       testPath,
       testPathExtract,
+      testHasTrailingSlash,
       testPort,
       testPortExtract,
       testProtocol,
