@@ -63,6 +63,7 @@ type alias Url = {
   host: List String,
   port': Int,
   path: List String,
+  hasTrailingSlash: Bool,
   hash: String,
   query: Query
 }
@@ -238,6 +239,10 @@ parsePath str =
 pathFromAll: String -> List String
 pathFromAll str =
   parsePath (extractPath str)
+  
+hasTrailingSlashFromAll: String -> Bool
+hasTrailingSlashFromAll str =
+    Regex.contains (Regex.regex "/$") (extractPath str)
 
 -- FRAGMENT
 
@@ -322,6 +327,7 @@ parse str =
     hash = (hashFromAll str),
     password = "",
     path = (pathFromAll str),
+    hasTrailingSlash = (hasTrailingSlashFromAll str),
     port' = (extractPort str),
     protocol = (extractProtocol str),
     query = (queryFromAll str),
@@ -380,6 +386,14 @@ pathComponent url =
     else
       "/" ++ (join "/" encoded)
 
+trailingSlashComponent: Url -> String
+trailingSlashComponent url =
+  if url.hasTrailingSlash == True then
+    "/"
+  else
+    ""
+
+
 {-| Convert to a string the hash component of an url, this includes '#'
 
     queryToString url == "#a/b"
@@ -415,6 +429,7 @@ new =
     password = "",
     host = [],
     path = [],
+    hasTrailingSlash = False,
     port' = 0,
     hash = "",
     query = Dict.empty
@@ -506,11 +521,13 @@ toString url =
       portComponent url
     path' =
       pathComponent url
+    trailingSlash' =
+      trailingSlashComponent url
     query' =
       queryToString url
     hash =
       hashToString url
   in
-    protocol' ++ host' ++ port' ++ path' ++ query' ++ hash
+    protocol' ++ host' ++ port' ++ path' ++ trailingSlash' ++ query' ++ hash
 
 
