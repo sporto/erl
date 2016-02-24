@@ -475,15 +475,15 @@ hashToString url =
 
     Erl.new ==
 
-    {
-      protocol = "",
-      username = "",
-      password = "",
-      host = [],
-      path = [],
-      port' = 0,
-      hash = "",
-      query = Dict.empty
+    { protocol = ""
+    , username = ""
+    , password = ""
+    , host = []
+    , path = []
+    , hasTrailingSlash = False
+    , port' = 0
+    , hash = ""
+    , query = Dict.empty
     }
 
 -}
@@ -567,16 +567,16 @@ appendPathSegments segments url =
 
 {-| Generate url string from an Erl.Url record
 
-    url = {
-      protocol = "http",
-      username = "",
-      password = "",
-      host = ["www", "foo", "com"],
-      path = ["users", "1"],
-      port' = 2000,
-      hash = "a/b",
-      query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
-    }
+    url = { protocol = "http",
+          , username = "",
+          , password = "",
+          , host = ["www", "foo", "com"],
+          , path = ["users", "1"],
+          , hasTrailingSlash = False
+          , port' = 2000,
+          , hash = "a/b",
+          , query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
+          }
 
     Erl.toString url == "http://www.foo.com:2000/users/1?k=2&q=1#a/b"
 
