@@ -1,4 +1,4 @@
-module Tests (..) where
+module ErlTests exposing (..)
 
 import String
 import Dict

@@ -1,4 +1,4 @@
-module Erl (addQuery, clearQuery, extractHash, extractHost, extractPath, extractPort, extractProtocol, extractQuery, new, parse, removeQuery, setQuery, appendPathSegments, toString, queryToString, Url, Query) where
+module Erl exposing (addQuery, clearQuery, extractHash, extractHost, extractPath, extractPort, extractProtocol, extractQuery, new, parse, removeQuery, setQuery, appendPathSegments, toString, queryToString, Url, Query)
 
 {-| Library for parsing and constructing URLs
 
