@@ -2,5 +2,6 @@
 node --version
 npm --version
 npm install -g elm
+cd test
 npm install
 elm-package install --yes
