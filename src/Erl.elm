@@ -49,6 +49,7 @@ type alias Url =
   , host : List String
   , port' : Int
   , path : List String
+  , hasLeadingSlash : Bool
   , hasTrailingSlash : Bool
   , hash : String
   , query : Query
@@ -269,6 +270,11 @@ pathFromAll str =
   parsePath (extractPath str)
 
 
+hasLeadingSlashFromAll : String -> Bool
+hasLeadingSlashFromAll str =
+  Regex.contains (Regex.regex "^/") (extractPath str)
+
+
 hasTrailingSlashFromAll : String -> Bool
 hasTrailingSlashFromAll str =
   Regex.contains (Regex.regex "/$") (extractPath str)
@@ -377,6 +383,7 @@ parse str =
   , hash = (hashFromAll str)
   , password = ""
   , path = (pathFromAll str)
+  , hasLeadingSlash = (hasLeadingSlashFromAll str)
   , hasTrailingSlash = (hasTrailingSlashFromAll str)
   , port' = (extractPort str)
   , protocol = (extractProtocol str)
@@ -444,11 +451,14 @@ pathComponent url =
   let
     encoded =
       List.map Http.uriEncode url.path
+    
+    leadingSlash =
+      if url.hasLeadingSlash then "/" else ""
   in
     if (List.length url.path) == 0 then
       ""
     else
-      "/" ++ (join "/" encoded)
+      leadingSlash ++ (join "/" encoded)
 
 
 trailingSlashComponent : Url -> String
@@ -480,6 +490,7 @@ hashToString url =
     , password = ""
     , host = []
     , path = []
+    , hasLeadingSlash = False
     , hasTrailingSlash = False
     , port' = 0
     , hash = ""
@@ -494,6 +505,7 @@ new =
   , password = ""
   , host = []
   , path = []
+  , hasLeadingSlash = False
   , hasTrailingSlash = False
   , port' = 0
   , hash = ""
@@ -572,6 +584,7 @@ appendPathSegments segments url =
           , password = "",
           , host = ["www", "foo", "com"],
           , path = ["users", "1"],
+          , hasLeadingSlash = False
           , hasTrailingSlash = False
           , port' = 2000,
           , hash = "a/b",

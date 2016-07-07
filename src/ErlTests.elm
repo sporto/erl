@@ -195,6 +195,26 @@ testPath =
       (List.map run inputs)
 
 
+testHasLeadingSlash : Test
+testHasLeadingSlash =
+  let
+    inputs =
+      [ ( "/users/all/?a=1", True )
+      , ( "http://foo.com/users/all/?a=1", True )
+      , ( "http://www.foo.com:2000/users/1?k=2&q=1#a/b", True )
+      , ( "users/all/?a=1", False )
+      ]
+    
+    run ( input, expected ) =
+      test
+        "Identifies the absence of a leading slash"
+        (assertEqual expected (Erl.parse input).hasLeadingSlash)
+  in
+  suite
+    "Path"
+    (List.map run inputs)
+
+
 testHasTrailingSlash : Test
 testHasTrailingSlash =
   let
@@ -364,6 +384,7 @@ testToString =
       , password = ""
       , host = [ "www", "foo", "com" ]
       , path = [ "users", "1" ]
+      , hasLeadingSlash = True
       , hasTrailingSlash = False
       , port' = 2000
       , hash = "a/b"
@@ -377,6 +398,7 @@ testToString =
       , host = []
       , port' = 0
       , path = []
+      , hasLeadingSlash = False
       , hasTrailingSlash = False
       , hash = ""
       , query = Dict.empty
@@ -460,6 +482,8 @@ testRoundTrips =
       , ( "With query string", "http://example.com/users/1?color=red" )
       , ( "With hash", "http://example.com/users/1#a/b" )
       , ( "With query and hash", "http://example.com/users/1?color=red#a/b" )
+      , ( "Without leading slash", "users/1?color=red#a/b" )
+      , ( "With leading slash", "/users/1?color=red#a/b" )
       ]
 
     run ( testCase, input ) =
@@ -485,6 +509,7 @@ testNew =
       , host = []
       , port' = 0
       , path = []
+      , hasLeadingSlash = False
       , hasTrailingSlash = False
       , hash = ""
       , query = Dict.empty
@@ -596,6 +621,7 @@ all =
     , testNew
     , testPath
     , testPathExtract
+    , testHasLeadingSlash
     , testHasTrailingSlash
     , testPort
     , testPortExtract
