@@ -604,6 +604,20 @@ testQueryClear =
       (assertEqual expected actual)
 
 
+testPathEdgeCase =
+  let
+    expected =
+      "http://some.domain/content"
+    
+    actual =
+      Erl.parse "http://some.domain"
+        |> Erl.appendPathSegments [ "content" ]
+        |> Erl.toString
+  in
+    test
+      "Single append with host"
+      (assertEqual expected actual)
+
 
 -- suite : String -> List Test -> Test
 
@@ -629,6 +643,7 @@ all =
     , testProtocolExtract
     , testQuery
     , testQueryClear
+    , testPathEdgeCase
     , testQueryExtract
     , testQueryToString
     , testRemoveQuery

@@ -453,7 +453,7 @@ pathComponent url =
       List.map Http.uriEncode url.path
     
     leadingSlash =
-      if url.hasLeadingSlash then "/" else ""
+      if hostComponent url /= "" || url.hasLeadingSlash then "/" else ""
   in
     if (List.length url.path) == 0 then
       ""
