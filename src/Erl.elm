@@ -232,9 +232,17 @@ extractPort str =
       |> Maybe.withDefault ""
       |> String.dropLeft 1
       |> toInt
-      |> Result.toMaybe
-      |> Maybe.withDefault 80
-
+      |> \(result) ->
+        case result of
+          Ok port' ->
+            port'
+          _ ->
+            case extractProtocol str of
+              "http" -> 80
+              "https" -> 443
+              "ftp" -> 21
+              "sftp" -> 22
+              _ -> 0
 
 
 -- PATH
@@ -451,7 +459,7 @@ pathComponent url =
   let
     encoded =
       List.map Http.uriEncode url.path
-    
+
     leadingSlash =
       if hostComponent url /= "" || url.hasLeadingSlash then "/" else ""
   in
