@@ -107,4 +107,4 @@ npm test
 - Username
 - Password
 
-## [Changelog](./changelog.md)
+## [Changelog](https://github.com/sporto/erl/blob/master/changelog.md)
