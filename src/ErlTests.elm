@@ -115,6 +115,30 @@ testPortExtract =
       , ( "http://example.com:3000/users", 3000 )
       , ( "http://example.com", 80 )
       , ( "http://example.com/users", 80 )
+
+      , ( "https://example.com:3000", 3000 )
+      , ( "https://example.com:3000/", 3000 )
+      , ( "https://example.com:3000/users", 3000 )
+      , ( "https://example.com", 443 )
+      , ( "https://example.com/users", 443 )
+
+      , ( "ftp://example.com:3000", 3000 )
+      , ( "ftp://example.com:3000/", 3000 )
+      , ( "ftp://example.com:3000/users", 3000 )
+      , ( "ftp://example.com", 21 )
+      , ( "ftp://example.com/users", 21 )
+
+      , ( "sftp://example.com:3000", 3000 )
+      , ( "sftp://example.com:3000/", 3000 )
+      , ( "sftp://example.com:3000/users", 3000 )
+      , ( "sftp://example.com", 22 )
+      , ( "sftp://example.com/users", 22 )
+
+      , ( "xyz://example.com:3000", 3000 )
+      , ( "xyz://example.com:3000/", 3000 )
+      , ( "xyz://example.com:3000/users", 3000 )
+      , ( "xyz://example.com", 0 )
+      , ( "xyz://example.com/users", 0 )
       ]
 
     run ( input, expected ) =
@@ -193,6 +217,26 @@ testPath =
     suite
       "Path"
       (List.map run inputs)
+
+
+testHasLeadingSlash : Test
+testHasLeadingSlash =
+  let
+    inputs =
+      [ ( "/users/all/?a=1", True )
+      , ( "http://foo.com/users/all/?a=1", True )
+      , ( "http://www.foo.com:2000/users/1?k=2&q=1#a/b", True )
+      , ( "users/all/?a=1", False )
+      ]
+
+    run ( input, expected ) =
+      test
+        "Identifies the absence of a leading slash"
+        (assertEqual expected (Erl.parse input).hasLeadingSlash)
+  in
+  suite
+    "Path"
+    (List.map run inputs)
 
 
 testHasTrailingSlash : Test
@@ -364,6 +408,7 @@ testToString =
       , password = ""
       , host = [ "www", "foo", "com" ]
       , path = [ "users", "1" ]
+      , hasLeadingSlash = True
       , hasTrailingSlash = False
       , port' = 2000
       , hash = "a/b"
@@ -377,6 +422,7 @@ testToString =
       , host = []
       , port' = 0
       , path = []
+      , hasLeadingSlash = False
       , hasTrailingSlash = False
       , hash = ""
       , query = Dict.empty
@@ -460,6 +506,8 @@ testRoundTrips =
       , ( "With query string", "http://example.com/users/1?color=red" )
       , ( "With hash", "http://example.com/users/1#a/b" )
       , ( "With query and hash", "http://example.com/users/1?color=red#a/b" )
+      , ( "Without leading slash", "users/1?color=red#a/b" )
+      , ( "With leading slash", "/users/1?color=red#a/b" )
       ]
 
     run ( testCase, input ) =
@@ -485,6 +533,7 @@ testNew =
       , host = []
       , port' = 0
       , path = []
+      , hasLeadingSlash = False
       , hasTrailingSlash = False
       , hash = ""
       , query = Dict.empty
@@ -579,6 +628,20 @@ testQueryClear =
       (assertEqual expected actual)
 
 
+testPathEdgeCase =
+  let
+    expected =
+      "http://some.domain/content"
+
+    actual =
+      Erl.parse "http://some.domain"
+        |> Erl.appendPathSegments [ "content" ]
+        |> Erl.toString
+  in
+    test
+      "Single append with host"
+      (assertEqual expected actual)
+
 
 -- suite : String -> List Test -> Test
 
@@ -596,6 +659,7 @@ all =
     , testNew
     , testPath
     , testPathExtract
+    , testHasLeadingSlash
     , testHasTrailingSlash
     , testPort
     , testPortExtract
@@ -603,6 +667,7 @@ all =
     , testProtocolExtract
     , testQuery
     , testQueryClear
+    , testPathEdgeCase
     , testQueryExtract
     , testQueryToString
     , testRemoveQuery

@@ -22,6 +22,7 @@ Erl.parse url
   port': 3000,
   path: ["products", "kids"],
   hash: "toys/1",
+  hasLeadingSlash: True,
   hasTrailingSlash: False,
   query: Dict {
     "color": "red",
@@ -105,10 +106,10 @@ npm test
 
 - Username
 - Password
-- Maybe more convenience methods for updating parts
 
 ## Changelog
 
+- `10.0.0` Added `hasLeadingSlash`
 - `9.0.0` Added `hasTrailingSlash`
 - `8.0.0` `hash` is a string, not a list anymore
 - `7.3.0` Added `hashToString`
