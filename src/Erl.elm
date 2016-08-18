@@ -216,6 +216,13 @@ host str =
 
 {-| Extract the port from the url
 
+If no port is included in the url then Erl will attempt to add a default port:
+
+Http -> 80
+Https -> 443
+FTP -> 21
+SFTP -> 22
+
 -}
 extractPort : String -> Int
 extractPort str =
