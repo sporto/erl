@@ -47,7 +47,7 @@ type alias Url =
   , username : String
   , password : String
   , host : List String
-  , port' : Int
+  , port_ : Int
   , path : List String
   , hasLeadingSlash : Bool
   , hasTrailingSlash : Bool
@@ -241,8 +241,8 @@ extractPort str =
       |> toInt
       |> \(result) ->
         case result of
-          Ok port' ->
-            port'
+          Ok port_ ->
+            port_
           _ ->
             case extractProtocol str of
               "http" -> 80
@@ -277,7 +277,8 @@ parsePath str =
   str
     |> split "/"
     |> List.filter notEmpty
-    |> List.map Http.uriDecode
+    |> List.map Http.decodeUri
+    |> List.map (Maybe.withDefault "")
 
 
 pathFromAll : String -> List String
@@ -349,13 +350,13 @@ queryStringElementToTuple element =
       Maybe.withDefault "" (List.head splitted)
 
     firstDecoded =
-      Http.uriDecode first
+      Http.decodeUri first |> Maybe.withDefault ""
 
     second =
       Maybe.withDefault "" (List.head (List.drop 1 splitted))
 
     secondDecoded =
-      Http.uriDecode second
+      Http.decodeUri second |> Maybe.withDefault ""
   in
     ( firstDecoded, secondDecoded )
 
@@ -400,7 +401,7 @@ parse str =
   , path = (pathFromAll str)
   , hasLeadingSlash = (hasLeadingSlashFromAll str)
   , hasTrailingSlash = (hasTrailingSlashFromAll str)
-  , port' = (extractPort str)
+  , port_ = (extractPort str)
   , protocol = (extractProtocol str)
   , query = (queryFromAll str)
   , username = ""
@@ -422,7 +423,7 @@ queryToString url =
       Dict.toList url.query
 
     encodedTuples =
-      List.map (\( x, y ) -> ( Http.uriEncode x, Http.uriEncode y )) tuples
+      List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) tuples
 
     parts =
       List.map (\( a, b ) -> a ++ "=" ++ b) encodedTuples
@@ -445,12 +446,12 @@ protocolComponent url =
 
 hostComponent : Url -> String
 hostComponent url =
-  Http.uriEncode (join "." url.host)
+  Http.encodeUri (join "." url.host)
 
 
 portComponent : Url -> String
 portComponent url =
-  case url.port' of
+  case url.port_ of
     0 ->
       ""
 
@@ -458,14 +459,14 @@ portComponent url =
       ""
 
     _ ->
-      ":" ++ (Basics.toString url.port')
+      ":" ++ (Basics.toString url.port_)
 
 
 pathComponent : Url -> String
 pathComponent url =
   let
     encoded =
-      List.map Http.uriEncode url.path
+      List.map Http.encodeUri url.path
 
     leadingSlash =
       if hostComponent url /= "" || url.hasLeadingSlash then "/" else ""
@@ -507,7 +508,7 @@ hashToString url =
     , path = []
     , hasLeadingSlash = False
     , hasTrailingSlash = False
-    , port' = 0
+    , port_ = 0
     , hash = ""
     , query = Dict.empty
     }
@@ -522,7 +523,7 @@ new =
   , path = []
   , hasLeadingSlash = False
   , hasTrailingSlash = False
-  , port' = 0
+  , port_ = 0
   , hash = ""
   , query = Dict.empty
   }
@@ -601,7 +602,7 @@ appendPathSegments segments url =
           , path = ["users", "1"],
           , hasLeadingSlash = False
           , hasTrailingSlash = False
-          , port' = 2000,
+          , port_ = 2000,
           , hash = "a/b",
           , query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
           }
@@ -612,25 +613,25 @@ appendPathSegments segments url =
 toString : Url -> String
 toString url =
   let
-    protocol' =
+    protocol_ =
       protocolComponent url
 
-    host' =
+    host_ =
       hostComponent url
 
-    port' =
+    port_ =
       portComponent url
 
-    path' =
+    path_ =
       pathComponent url
 
-    trailingSlash' =
+    trailingSlash_ =
       trailingSlashComponent url
 
-    query' =
+    query_ =
       queryToString url
 
     hash =
       hashToString url
   in
-    protocol' ++ host' ++ port' ++ path' ++ trailingSlash' ++ query' ++ hash
+    protocol_ ++ host_ ++ port_ ++ path_ ++ trailingSlash_ ++ query_ ++ hash

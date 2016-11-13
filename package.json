@@ -4,7 +4,7 @@
   "description": "A URL parsing library for ELM",
   "main": "elm.js",
   "scripts": {
-    "test": "elm-make TestRunner.elm --output tests.js && node tests.js"
+    "test": "elm-test test/TestRunner.elm"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/sporto/erl#readme",
   "dependencies": {
-    "elm-test": "^0.16.1-alpha2"
+    "elm": "^0.18.0-beta",
+    "elm-test": "^0.18.0-alpha"
   }
 }

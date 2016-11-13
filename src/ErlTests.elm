@@ -3,7 +3,8 @@ module ErlTests exposing (..)
 import String
 import Dict
 import Erl
-import ElmTest exposing (..)
+import Test exposing (..)
+import Expect
 
 
 -- PROTOCOL
@@ -17,11 +18,10 @@ testProtocol =
       ]
 
     run ( input, expected ) =
-      test
-        "Protocol"
-        (assertEqual expected (Erl.parse input).protocol)
+      test "Protocol" <|
+        \() -> Expect.equal expected (Erl.parse input).protocol
   in
-    suite
+    describe
       "Protocol"
       (List.map run inputs)
 
@@ -35,11 +35,10 @@ testProtocolExtract =
       ]
 
     run ( input, expected ) =
-      test
-        "Protocol"
-        (assertEqual expected (Erl.extractProtocol input))
+      test "Protocol" <|
+        \() -> Expect.equal expected (Erl.extractProtocol input)
   in
-    suite
+    describe
       "Extract protocol"
       (List.map run inputs)
 
@@ -76,11 +75,10 @@ testHostExtract =
       ]
 
     run ( input, expected ) =
-      test
-        ("Extracts host " ++ input)
-        (assertEqual expected (Erl.extractHost input))
+      test ("Extracts host " ++ input) <|
+        \() -> Expect.equal expected (Erl.extractHost input)
   in
-    suite
+    describe
       "Extract host"
       (List.map run inputs)
 
@@ -93,11 +91,10 @@ testHost =
       ]
 
     run ( input, expected ) =
-      test
-        ("Parses host in " ++ input)
-        (assertEqual expected (Erl.parse input).host)
+      test ("Parses host in " ++ input) <|
+        \() -> Expect.equal expected (Erl.parse input).host
   in
-    suite
+    describe
       "Parses host"
       (List.map run inputs)
 
@@ -142,11 +139,10 @@ testPortExtract =
       ]
 
     run ( input, expected ) =
-      test
-        "Extracts the port"
-        (assertEqual expected (Erl.extractPort input))
+      test "Extracts the port" <|
+        \() -> Expect.equal expected (Erl.extractPort input)
   in
-    suite
+    describe
       "Extract port"
       (List.map run inputs)
 
@@ -160,11 +156,10 @@ testPort =
       ]
 
     run ( input, expected ) =
-      test
-        "Extracts the port"
-        (assertEqual expected (Erl.parse input).port')
+      test "Extracts the port" <|
+        \() -> Expect.equal expected (Erl.parse input).port_
   in
-    suite
+    describe
       "Port"
       (List.map run inputs)
 
@@ -189,11 +184,10 @@ testPathExtract =
       ]
 
     run ( input, expected ) =
-      test
-        ("Extracts path " ++ input)
-        (assertEqual expected (Erl.extractPath input))
+      test ("Extracts path " ++ input) <|
+        \() -> Expect.equal expected (Erl.extractPath input)
   in
-    suite
+    describe
       "Extract path"
       (List.map run inputs)
 
@@ -210,11 +204,10 @@ testPath =
       ]
 
     run ( input, expected ) =
-      test
-        "Parses the path"
-        (assertEqual expected (Erl.parse input).path)
+      test "Parses the path" <|
+        \() -> Expect.equal expected (Erl.parse input).path
   in
-    suite
+    describe
       "Path"
       (List.map run inputs)
 
@@ -230,11 +223,10 @@ testHasLeadingSlash =
       ]
 
     run ( input, expected ) =
-      test
-        "Identifies the absence of a leading slash"
-        (assertEqual expected (Erl.parse input).hasLeadingSlash)
+      test "Identifies the absence of a leading slash" <|
+        \() -> Expect.equal expected (Erl.parse input).hasLeadingSlash
   in
-  suite
+  describe
     "Path"
     (List.map run inputs)
 
@@ -248,11 +240,10 @@ testHasTrailingSlash =
       ]
 
     run ( input, expected ) =
-      test
-        "Identifies the presence of a trailing slash"
-        (assertEqual expected (Erl.parse input).hasTrailingSlash)
+      test "Identifies the presence of a trailing slash" <|
+        \() -> Expect.equal expected (Erl.parse input).hasTrailingSlash
   in
-    suite
+    describe
       "Path"
       (List.map run inputs)
 
@@ -274,11 +265,10 @@ testAppendPathSegments =
         actual =
           (Erl.appendPathSegments inputPathSegments inputUrlAsUrl).path
       in
-        test
-          "Appends segments to the path"
-          (assertEqual expected actual)
+        test "Appends segments to the path" <|
+          \() -> Expect.equal expected actual
   in
-    suite
+    describe
       "appendPathSegments"
       (List.map run inputs)
 
@@ -295,11 +285,10 @@ testHashExtract =
       ]
 
     run ( input, expected ) =
-      test
-        "Extracts the hash"
-        (assertEqual expected (Erl.extractHash input))
+      test "Extracts the hash" <|
+        \() -> Expect.equal expected (Erl.extractHash input)
   in
-    suite
+    describe
       "Hash"
       (List.map run inputs)
 
@@ -327,11 +316,11 @@ testHash =
           (Erl.parse input).hash
 
         result =
-          assertEqual expected actual
+          Expect.equal expected actual
       in
-        test testCase result
+        test testCase <| \() -> result
   in
-    suite
+    describe
       "Hash"
       (List.map run inputs)
 
@@ -348,11 +337,10 @@ testQueryExtract =
       ]
 
     run ( input, expected ) =
-      test
-        "Extracts the query"
-        (assertEqual expected (Erl.extractQuery input))
+      test "Extracts the query" <|
+        \() -> Expect.equal expected (Erl.extractQuery input)
   in
-    suite
+    describe
       "Query"
       (List.map run inputs)
 
@@ -365,11 +353,10 @@ testQuery =
       ]
 
     run ( input, expected ) =
-      test
-        "Parses the query"
-        (assertEqual expected (Erl.parse input).query)
+      test "Parses the query" <|
+        \() -> Expect.equal expected (Erl.parse input).query
   in
-    suite
+    describe
       "Query"
       (List.map run inputs)
 
@@ -389,11 +376,10 @@ testQueryToString =
         actual =
           Erl.queryToString url
       in
-        test
-          "queryToString"
-          (assertEqual expected actual)
+        test "queryToString" <|
+          \() -> Expect.equal expected actual
   in
-    suite "queryToString" (List.map run inputs)
+    describe "queryToString" (List.map run inputs)
 
 
 
@@ -410,7 +396,7 @@ testToString =
       , path = [ "users", "1" ]
       , hasLeadingSlash = True
       , hasTrailingSlash = False
-      , port' = 2000
+      , port_ = 2000
       , hash = "a/b"
       , query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
       }
@@ -420,7 +406,7 @@ testToString =
       , username = ""
       , password = ""
       , host = []
-      , port' = 0
+      , port_ = 0
       , path = []
       , hasLeadingSlash = False
       , hasTrailingSlash = False
@@ -442,7 +428,7 @@ testToString =
         , "www.foo.com:2000/users/1?k=2&q=1#a/b"
         )
       , ( "it doesn't include the port when it is 80"
-        , { url1 | port' = 80 }
+        , { url1 | port_ = 80 }
         , "http://www.foo.com/users/1?k=2&q=1#a/b"
         )
       , ( "it doesn't add # when hash is empty"
@@ -486,11 +472,11 @@ testToString =
           Erl.toString input
 
         result =
-          assertEqual expected actual
+          Expect.equal expected actual
       in
-        test testCase result
+        test testCase <| \() -> result
   in
-    suite
+    describe
       "toString"
       (List.map run inputs)
 
@@ -515,11 +501,10 @@ testRoundTrips =
         actual =
           (input |> Erl.parse |> Erl.toString)
       in
-        test
-          testCase
-          (assertEqual input actual)
+        test testCase <|
+          \() -> Expect.equal input actual
   in
-    suite
+    describe
       "Round trip"
       (List.map run inputs)
 
@@ -531,7 +516,7 @@ testNew =
       , username = ""
       , password = ""
       , host = []
-      , port' = 0
+      , port_ = 0
       , path = []
       , hasLeadingSlash = False
       , hasTrailingSlash = False
@@ -542,9 +527,8 @@ testNew =
     actual =
       Erl.new
   in
-    test
-      "Generates an empty url"
-      (assertEqual expected actual)
+    test "Generates an empty url" <|
+      \() -> Expect.equal expected actual
 
 
 testAddQuery =
@@ -565,11 +549,10 @@ testAddQuery =
       ]
 
     run ( actual, expected ) =
-      test
-        "addQuery"
-        (assertEqual expected actual)
+      test "addQuery" <|
+        \() -> Expect.equal expected actual
   in
-    suite
+    describe
       "Adds to the query"
       (List.map run inputs)
 
@@ -586,11 +569,10 @@ testSetQuery =
       ]
 
     run ( actual, expected ) =
-      test
-        "setQuery"
-        (assertEqual expected actual)
+      test "setQuery" <|
+        \() -> Expect.equal expected actual
   in
-    suite
+    describe
       "Sets the query"
       (List.map run inputs)
 
@@ -607,9 +589,8 @@ testRemoveQuery =
         |> Erl.removeQuery "b"
         |> .query
   in
-    test
-      "Removes the query"
-      (assertEqual expected actual)
+    test "Removes the query" <|
+      \() -> Expect.equal expected actual
 
 
 testQueryClear =
@@ -623,9 +604,8 @@ testQueryClear =
         |> Erl.clearQuery
         |> .query
   in
-    test
-      "Cleans the query"
-      (assertEqual expected actual)
+    test "Cleans the query" <|
+      \() -> Expect.equal expected actual
 
 
 testPathEdgeCase =
@@ -638,17 +618,16 @@ testPathEdgeCase =
         |> Erl.appendPathSegments [ "content" ]
         |> Erl.toString
   in
-    test
-      "Single append with host"
-      (assertEqual expected actual)
+    test "Single append with host" <|
+        \() -> Expect.equal expected actual
 
 
--- suite : String -> List Test -> Test
+-- describe : String -> List Test -> Test
 
 
 all : Test
 all =
-  suite
+  describe
     "Tests"
     [ testAddQuery
     , testAppendPathSegments
