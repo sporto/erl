@@ -19,7 +19,7 @@ Erl.parse url
   username: "sam",
   password: "pass",
   host: ["api", "example", "com"],
-  port': 3000,
+  port_: 3000,
   path: ["products", "kids"],
   hash: "toys/1",
   hasLeadingSlash: True,
@@ -54,7 +54,7 @@ url =
 {url | host = ["api", "acme", "com"] }
 
 -- Modify port
-{ url | port' = 9000 }
+{ url | port_ = 9000 }
 
 -- Modify path
 {url | path = ["users", "1"] }
@@ -97,7 +97,7 @@ Erl.toString url
 ## Test
 
 ```
-npm i
+yarn install
 npm test
 ```
 
