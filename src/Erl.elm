@@ -37,23 +37,23 @@ import String exposing (..)
 {-| A Dict that holds keys and values for the query string
 -}
 type alias Query =
-  Dict.Dict String String
+    Dict.Dict String String
 
 
 {-| Record that holds url attributes
 -}
 type alias Url =
-  { protocol : String
-  , username : String
-  , password : String
-  , host : List String
-  , port_ : Int
-  , path : List String
-  , hasLeadingSlash : Bool
-  , hasTrailingSlash : Bool
-  , hash : String
-  , query : Query
-  }
+    { protocol : String
+    , username : String
+    , password : String
+    , host : List String
+    , port_ : Int
+    , path : List String
+    , hasLeadingSlash : Bool
+    , hasTrailingSlash : Bool
+    , hash : String
+    , query : Query
+    }
 
 
 
@@ -62,7 +62,7 @@ type alias Url =
 
 notEmpty : String -> Bool
 notEmpty str =
-  not (isEmpty str)
+    not (isEmpty str)
 
 
 
@@ -71,34 +71,34 @@ notEmpty str =
 
 rightFrom : String -> String -> String
 rightFrom delimiter str =
-  let
-    parts =
-      split delimiter str
-  in
-    case List.length parts of
-      0 ->
-        ""
+    let
+        parts =
+            split delimiter str
+    in
+        case List.length parts of
+            0 ->
+                ""
 
-      1 ->
-        ""
+            1 ->
+                ""
 
-      _ ->
-        parts
-          |> List.reverse
-          |> List.head
-          |> Maybe.withDefault ""
+            _ ->
+                parts
+                    |> List.reverse
+                    |> List.head
+                    |> Maybe.withDefault ""
 
 
 rightFromOrSame : String -> String -> String
 rightFromOrSame delimiter str =
-  let
-    parts =
-      split delimiter str
-  in
-    parts
-      |> List.reverse
-      |> List.head
-      |> Maybe.withDefault ""
+    let
+        parts =
+            split delimiter str
+    in
+        parts
+            |> List.reverse
+            |> List.head
+            |> Maybe.withDefault ""
 
 
 
@@ -109,13 +109,13 @@ rightFromOrSame delimiter str =
 
 leftFromOrSame : String -> String -> String
 leftFromOrSame delimiter str =
-  let
-    parts =
-      split delimiter str
-  in
-    parts
-      |> List.head
-      |> Maybe.withDefault ""
+    let
+        parts =
+            split delimiter str
+    in
+        parts
+            |> List.head
+            |> Maybe.withDefault ""
 
 
 
@@ -126,22 +126,22 @@ leftFromOrSame delimiter str =
 
 leftFrom : String -> String -> String
 leftFrom delimiter str =
-  let
-    parts =
-      split delimiter str
+    let
+        parts =
+            split delimiter str
 
-    head =
-      List.head parts
-  in
-    case List.length parts of
-      0 ->
-        ""
+        head =
+            List.head parts
+    in
+        case List.length parts of
+            0 ->
+                ""
 
-      1 ->
-        ""
+            1 ->
+                ""
 
-      _ ->
-        head |> Maybe.withDefault ""
+            _ ->
+                head |> Maybe.withDefault ""
 
 
 
@@ -153,16 +153,16 @@ leftFrom delimiter str =
 -}
 extractProtocol : String -> String
 extractProtocol str =
-  let
-    parts =
-      split "://" str
-  in
-    case List.length parts of
-      1 ->
-        ""
+    let
+        parts =
+            split "://" str
+    in
+        case List.length parts of
+            1 ->
+                ""
 
-      _ ->
-        Maybe.withDefault "" (List.head parts)
+            _ ->
+                Maybe.withDefault "" (List.head parts)
 
 
 
@@ -180,34 +180,34 @@ extractProtocol str =
 
 extractHost : String -> String
 extractHost str =
-  let
-    dotsRx =
-      "((\\w|-)+\\.)+(\\w|-)+"
+    let
+        dotsRx =
+            "((\\w|-)+\\.)+(\\w|-)+"
 
-    localhostRx =
-      "localhost"
+        localhostRx =
+            "localhost"
 
-    rx =
-      "(" ++ dotsRx ++ "|" ++ localhostRx ++ ")"
-  in
-    str
-      |> rightFromOrSame "//"
-      |> leftFromOrSame "/"
-      |> Regex.find (Regex.AtMost 1) (Regex.regex rx)
-      |> List.map .match
-      |> List.head
-      |> Maybe.withDefault ""
+        rx =
+            "(" ++ dotsRx ++ "|" ++ localhostRx ++ ")"
+    in
+        str
+            |> rightFromOrSame "//"
+            |> leftFromOrSame "/"
+            |> Regex.find (Regex.AtMost 1) (Regex.regex rx)
+            |> List.map .match
+            |> List.head
+            |> Maybe.withDefault ""
 
 
 parseHost : String -> List String
 parseHost str =
-  str
-    |> split "."
+    str
+        |> split "."
 
 
 host : String -> List String
 host str =
-  parseHost (extractHost str)
+    parseHost (extractHost str)
 
 
 
@@ -226,30 +226,41 @@ SFTP -> 22
 -}
 extractPort : String -> Int
 extractPort str =
-  let
-    rx =
-      Regex.regex ":\\d+"
+    let
+        rx =
+            Regex.regex ":\\d+"
 
-    res =
-      Regex.find (Regex.AtMost 1) rx str
-  in
-    res
-      |> List.map .match
-      |> List.head
-      |> Maybe.withDefault ""
-      |> String.dropLeft 1
-      |> toInt
-      |> \(result) ->
-        case result of
-          Ok port_ ->
-            port_
-          _ ->
-            case extractProtocol str of
-              "http" -> 80
-              "https" -> 443
-              "ftp" -> 21
-              "sftp" -> 22
-              _ -> 0
+        res =
+            Regex.find (Regex.AtMost 1) rx str
+    in
+        res
+            |> List.map .match
+            |> List.head
+            |> Maybe.withDefault ""
+            |> String.dropLeft 1
+            |> toInt
+            |> \result ->
+                case result of
+                    Ok port_ ->
+                        port_
+
+                    _ ->
+                        case extractProtocol str of
+                            "http" ->
+                                80
+
+                            "https" ->
+                                443
+
+                            "ftp" ->
+                                21
+
+                            "sftp" ->
+                                22
+
+                            _ ->
+                                0
+
 
 
 -- PATH
@@ -260,40 +271,40 @@ extractPort str =
 -}
 extractPath : String -> String
 extractPath str =
-  let
-    host =
-      extractHost str
-  in
-    str
-      |> rightFromOrSame "//"
-      |> leftFromOrSame "?"
-      |> leftFromOrSame "#"
-      |> Regex.replace (Regex.AtMost 1) (Regex.regex host) (\_ -> "")
-      |> Regex.replace (Regex.AtMost 1) (Regex.regex ":\\d+") (\_ -> "")
+    let
+        host =
+            extractHost str
+    in
+        str
+            |> rightFromOrSame "//"
+            |> leftFromOrSame "?"
+            |> leftFromOrSame "#"
+            |> Regex.replace (Regex.AtMost 1) (Regex.regex host) (\_ -> "")
+            |> Regex.replace (Regex.AtMost 1) (Regex.regex ":\\d+") (\_ -> "")
 
 
 parsePath : String -> List String
 parsePath str =
-  str
-    |> split "/"
-    |> List.filter notEmpty
-    |> List.map Http.decodeUri
-    |> List.map (Maybe.withDefault "")
+    str
+        |> split "/"
+        |> List.filter notEmpty
+        |> List.map Http.decodeUri
+        |> List.map (Maybe.withDefault "")
 
 
 pathFromAll : String -> List String
 pathFromAll str =
-  parsePath (extractPath str)
+    parsePath (extractPath str)
 
 
 hasLeadingSlashFromAll : String -> Bool
 hasLeadingSlashFromAll str =
-  Regex.contains (Regex.regex "^/") (extractPath str)
+    Regex.contains (Regex.regex "^/") (extractPath str)
 
 
 hasTrailingSlashFromAll : String -> Bool
 hasTrailingSlashFromAll str =
-  Regex.contains (Regex.regex "/$") (extractPath str)
+    Regex.contains (Regex.regex "/$") (extractPath str)
 
 
 
@@ -305,16 +316,16 @@ hasTrailingSlashFromAll str =
 -}
 extractHash : String -> String
 extractHash str =
-  str
-    |> split "#"
-    |> List.drop 1
-    |> List.head
-    |> Maybe.withDefault ""
+    str
+        |> split "#"
+        |> List.drop 1
+        |> List.head
+        |> Maybe.withDefault ""
 
 
 hashFromAll : String -> String
 hashFromAll str =
-  extractHash str
+    extractHash str
 
 
 
@@ -326,14 +337,14 @@ hashFromAll str =
 -}
 extractQuery : String -> String
 extractQuery str =
-  str
-    |> split "?"
-    |> List.drop 1
-    |> List.head
-    |> Maybe.withDefault ""
-    |> split "#"
-    |> List.head
-    |> Maybe.withDefault ""
+    str
+        |> split "?"
+        |> List.drop 1
+        |> List.head
+        |> Maybe.withDefault ""
+        |> split "#"
+        |> List.head
+        |> Maybe.withDefault ""
 
 
 
@@ -342,23 +353,23 @@ extractQuery str =
 
 queryStringElementToTuple : String -> ( String, String )
 queryStringElementToTuple element =
-  let
-    splitted =
-      split "=" element
+    let
+        splitted =
+            split "=" element
 
-    first =
-      Maybe.withDefault "" (List.head splitted)
+        first =
+            Maybe.withDefault "" (List.head splitted)
 
-    firstDecoded =
-      Http.decodeUri first |> Maybe.withDefault ""
+        firstDecoded =
+            Http.decodeUri first |> Maybe.withDefault ""
 
-    second =
-      Maybe.withDefault "" (List.head (List.drop 1 splitted))
+        second =
+            Maybe.withDefault "" (List.head (List.drop 1 splitted))
 
-    secondDecoded =
-      Http.decodeUri second |> Maybe.withDefault ""
-  in
-    ( firstDecoded, secondDecoded )
+        secondDecoded =
+            Http.decodeUri second |> Maybe.withDefault ""
+    in
+        ( firstDecoded, secondDecoded )
 
 
 
@@ -367,26 +378,26 @@ queryStringElementToTuple element =
 
 queryTuples : String -> List ( String, String )
 queryTuples queryString =
-  let
-    splitted =
-      split "&" queryString
-  in
-    if String.isEmpty queryString then
-      []
-    else
-      List.map queryStringElementToTuple splitted
+    let
+        splitted =
+            split "&" queryString
+    in
+        if String.isEmpty queryString then
+            []
+        else
+            List.map queryStringElementToTuple splitted
 
 
 parseQuery : String -> Query
 parseQuery str =
-  Dict.fromList (queryTuples str)
+    Dict.fromList (queryTuples str)
 
 
 queryFromAll : String -> Query
 queryFromAll all =
-  all
-    |> extractQuery
-    |> parseQuery
+    all
+        |> extractQuery
+        |> parseQuery
 
 
 {-| Parse a url string, returns an Erl.Url record
@@ -395,17 +406,17 @@ queryFromAll all =
 -}
 parse : String -> Url
 parse str =
-  { host = (host str)
-  , hash = (hashFromAll str)
-  , password = ""
-  , path = (pathFromAll str)
-  , hasLeadingSlash = (hasLeadingSlashFromAll str)
-  , hasTrailingSlash = (hasTrailingSlashFromAll str)
-  , port_ = (extractPort str)
-  , protocol = (extractProtocol str)
-  , query = (queryFromAll str)
-  , username = ""
-  }
+    { host = (host str)
+    , hash = (hashFromAll str)
+    , password = ""
+    , path = (pathFromAll str)
+    , hasLeadingSlash = (hasLeadingSlashFromAll str)
+    , hasTrailingSlash = (hasTrailingSlashFromAll str)
+    , port_ = (extractPort str)
+    , protocol = (extractProtocol str)
+    , query = (queryFromAll str)
+    , username = ""
+    }
 
 
 
@@ -418,71 +429,74 @@ parse str =
 -}
 queryToString : Url -> String
 queryToString url =
-  let
-    tuples =
-      Dict.toList url.query
+    let
+        tuples =
+            Dict.toList url.query
 
-    encodedTuples =
-      List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) tuples
+        encodedTuples =
+            List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) tuples
 
-    parts =
-      List.map (\( a, b ) -> a ++ "=" ++ b) encodedTuples
-  in
-    if Dict.isEmpty url.query then
-      ""
-    else
-      "?" ++ (join "&" parts)
+        parts =
+            List.map (\( a, b ) -> a ++ "=" ++ b) encodedTuples
+    in
+        if Dict.isEmpty url.query then
+            ""
+        else
+            "?" ++ (join "&" parts)
 
 
 protocolComponent : Url -> String
 protocolComponent url =
-  case url.protocol of
-    "" ->
-      ""
+    case url.protocol of
+        "" ->
+            ""
 
-    _ ->
-      url.protocol ++ "://"
+        _ ->
+            url.protocol ++ "://"
 
 
 hostComponent : Url -> String
 hostComponent url =
-  Http.encodeUri (join "." url.host)
+    Http.encodeUri (join "." url.host)
 
 
 portComponent : Url -> String
 portComponent url =
-  case url.port_ of
-    0 ->
-      ""
+    case url.port_ of
+        0 ->
+            ""
 
-    80 ->
-      ""
+        80 ->
+            ""
 
-    _ ->
-      ":" ++ (Basics.toString url.port_)
+        _ ->
+            ":" ++ (Basics.toString url.port_)
 
 
 pathComponent : Url -> String
 pathComponent url =
-  let
-    encoded =
-      List.map Http.encodeUri url.path
+    let
+        encoded =
+            List.map Http.encodeUri url.path
 
-    leadingSlash =
-      if hostComponent url /= "" || url.hasLeadingSlash then "/" else ""
-  in
-    if (List.length url.path) == 0 then
-      ""
-    else
-      leadingSlash ++ (join "/" encoded)
+        leadingSlash =
+            if hostComponent url /= "" || url.hasLeadingSlash then
+                "/"
+            else
+                ""
+    in
+        if (List.length url.path) == 0 then
+            ""
+        else
+            leadingSlash ++ (join "/" encoded)
 
 
 trailingSlashComponent : Url -> String
 trailingSlashComponent url =
-  if url.hasTrailingSlash == True then
-    "/"
-  else
-    ""
+    if url.hasTrailingSlash == True then
+        "/"
+    else
+        ""
 
 
 {-| Convert to a string the hash component of an url, this includes '#'
@@ -491,10 +505,10 @@ trailingSlashComponent url =
 -}
 hashToString : Url -> String
 hashToString url =
-  if String.isEmpty url.hash then
-    ""
-  else
-    "#" ++ url.hash
+    if String.isEmpty url.hash then
+        ""
+    else
+        "#" ++ url.hash
 
 
 {-| Generate an empty Erl.Url record
@@ -516,17 +530,17 @@ hashToString url =
 -}
 new : Url
 new =
-  { protocol = ""
-  , username = ""
-  , password = ""
-  , host = []
-  , path = []
-  , hasLeadingSlash = False
-  , hasTrailingSlash = False
-  , port_ = 0
-  , hash = ""
-  , query = Dict.empty
-  }
+    { protocol = ""
+    , username = ""
+    , password = ""
+    , host = []
+    , path = []
+    , hasLeadingSlash = False
+    , hasTrailingSlash = False
+    , port_ = 0
+    , hash = ""
+    , query = Dict.empty
+    }
 
 
 {-| Clears the current query string
@@ -535,7 +549,7 @@ new =
 -}
 clearQuery : Url -> Url
 clearQuery url =
-  { url | query = Dict.empty }
+    { url | query = Dict.empty }
 
 
 {-| Set key/value in query string
@@ -544,14 +558,14 @@ clearQuery url =
 -}
 addQuery : String -> String -> Url -> Url
 addQuery key val url =
-  let
-    updated =
-      if String.isEmpty val then
-        Dict.remove key url.query
-      else
-        Dict.insert key val url.query
-  in
-    { url | query = updated }
+    let
+        updated =
+            if String.isEmpty val then
+                Dict.remove key url.query
+            else
+                Dict.insert key val url.query
+    in
+        { url | query = updated }
 
 
 {-| Set key/value in query string, removes any existing ones
@@ -560,11 +574,11 @@ addQuery key val url =
 -}
 setQuery : String -> String -> Url -> Url
 setQuery key val url =
-  let
-    updated =
-      Dict.singleton key val
-  in
-    { url | query = updated }
+    let
+        updated =
+            Dict.singleton key val
+    in
+        { url | query = updated }
 
 
 {-| Removes key from query string
@@ -573,11 +587,11 @@ setQuery key val url =
 -}
 removeQuery : String -> Url -> Url
 removeQuery key url =
-  let
-    updated =
-      Dict.remove key url.query
-  in
-    { url | query = updated }
+    let
+        updated =
+            Dict.remove key url.query
+    in
+        { url | query = updated }
 
 
 {-| Append some path segments to a url
@@ -586,11 +600,11 @@ removeQuery key url =
 -}
 appendPathSegments : List String -> Url -> Url
 appendPathSegments segments url =
-  let
-    newPath =
-      List.append url.path segments
-  in
-    { url | path = newPath }
+    let
+        newPath =
+            List.append url.path segments
+    in
+        { url | path = newPath }
 
 
 {-| Generate url string from an Erl.Url record
@@ -612,26 +626,26 @@ appendPathSegments segments url =
 -}
 toString : Url -> String
 toString url =
-  let
-    protocol_ =
-      protocolComponent url
+    let
+        protocol_ =
+            protocolComponent url
 
-    host_ =
-      hostComponent url
+        host_ =
+            hostComponent url
 
-    port_ =
-      portComponent url
+        port_ =
+            portComponent url
 
-    path_ =
-      pathComponent url
+        path_ =
+            pathComponent url
 
-    trailingSlash_ =
-      trailingSlashComponent url
+        trailingSlash_ =
+            trailingSlashComponent url
 
-    query_ =
-      queryToString url
+        query_ =
+            queryToString url
 
-    hash =
-      hashToString url
-  in
-    protocol_ ++ host_ ++ port_ ++ path_ ++ trailingSlash_ ++ query_ ++ hash
+        hash =
+            hashToString url
+    in
+        protocol_ ++ host_ ++ port_ ++ path_ ++ trailingSlash_ ++ query_ ++ hash
