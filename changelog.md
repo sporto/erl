@@ -1,6 +1,6 @@
 # Changelog
 
-- `11.0.0`   Upgrade to Elm 0.18
+- `10.0.2`   Upgrade to Elm 0.18
 - `10.0.1`   `extractPort` attempts to add a default port if missing in the url
 - `10.0.0`   Added `hasLeadingSlash`
 - `9.0.0`    Added `hasTrailingSlash`
