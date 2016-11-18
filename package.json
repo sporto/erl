@@ -4,7 +4,7 @@
   "description": "A URL parsing library for ELM",
   "main": "elm.js",
   "scripts": {
-    "test": "elm-test"
+    "test": "elm-test tests/Main.elm"
   },
   "repository": {
     "type": "git",
