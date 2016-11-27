@@ -44,41 +44,7 @@ url =
   Erl.new
 ```
 
-### Mutations
-
-```elm
--- Modify the protocol
-{ url | protocol = "https" }
-
--- Modify host
-{url | host = ["api", "acme", "com"] }
-
--- Modify port
-{ url | port_ = 9000 }
-
--- Modify path
-{url | path = ["users", "1"] }
-
--- Modify path by appending segments
-Erl.appendPathSegments url ["users", "1"]
-
--- Modify hash
-{url | hash = "users/1" }
-
--- Clear query string
-Erl.clearQuery url
-
--- Add one query string key/value (patches previous query string)
-Erl.addQuery "key" "value" url
-
--- Remove one query string key/value
-Erl.removeQuery "key" url
-
--- Replaces query string with key/value (removes any previous keys)
-Erl.setQuery "key" "value" url
-```
-
-### `toString`
+## `toString`
 
 ```elm
 -- Given a Erl.Url record (url):
