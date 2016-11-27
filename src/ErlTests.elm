@@ -330,8 +330,9 @@ testQueryExtract =
 testQuery =
     let
         inputs =
-            [ ( "users?a=1&b=2", Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2" )
-            , ( "users?a%3F=1%26", Dict.empty |> Dict.insert "a?" "1&" )
+            [ ( "users?a=1&b=2", [ ( "a", "1" ), ( "b", "2" ) ] )
+            , ( "users?a%3F=1%26", [ ( "a?", "1&" ) ] )
+            , ( "users?a=1&a=2", [ ( "a", "1" ), ( "a", "2" ) ] )
             ]
 
         run ( input, expected ) =
@@ -379,7 +380,7 @@ testToString =
             , hasTrailingSlash = False
             , port_ = 2000
             , hash = "a/b"
-            , query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
+            , query = [ ( "q", "1" ), ( "k", "2" ) ]
             }
 
         url2 =
@@ -392,57 +393,61 @@ testToString =
             , hasLeadingSlash = False
             , hasTrailingSlash = False
             , hash = ""
-            , query = Dict.empty
+            , query = []
             }
 
         inputs =
             [ ( "it converts to string"
               , url1
-              , "http://www.foo.com:2000/users/1?k=2&q=1#a/b"
+              , "http://www.foo.com:2000/users/1?q=1&k=2#a/b"
               )
             , ( "it can have a trailing slash"
               , { url1 | hasTrailingSlash = True }
-              , "http://www.foo.com:2000/users/1/?k=2&q=1#a/b"
+              , "http://www.foo.com:2000/users/1/?q=1&k=2#a/b"
               )
             , ( "it can have an empty protocol"
               , { url1 | protocol = "" }
-              , "www.foo.com:2000/users/1?k=2&q=1#a/b"
+              , "www.foo.com:2000/users/1?q=1&k=2#a/b"
               )
             , ( "it doesn't include the port when it is 80"
               , { url1 | port_ = 80 }
-              , "http://www.foo.com/users/1?k=2&q=1#a/b"
+              , "http://www.foo.com/users/1?q=1&k=2#a/b"
               )
             , ( "it doesn't add # when hash is empty"
               , { url1 | hash = "" }
-              , "http://www.foo.com:2000/users/1?k=2&q=1"
+              , "http://www.foo.com:2000/users/1?q=1&k=2"
               )
             , ( "it doesn't add query when query is empty"
-              , { url1 | query = Dict.empty }
+              , { url1 | query = [] }
               , "http://www.foo.com:2000/users/1#a/b"
+              )
+            , ( "it adds duplicate values in the query"
+              , { url1 | query = [ ( "a", "1" ), ( "a", "2" ) ] }
+              , "http://www.foo.com:2000/users/1?a=1&a=2#a/b"
               )
             , --
               ( "it encodes values in host"
               , { url1 | host = [ "aa/bb", "com" ] }
-              , "http://aa%2Fbb.com:2000/users/1?k=2&q=1#a/b"
+              , "http://aa%2Fbb.com:2000/users/1?q=1&k=2#a/b"
               )
             , ( "it encodes values in path"
               , { url1 | path = [ "aa/bb", "2" ] }
-              , "http://www.foo.com:2000/aa%2Fbb/2?k=2&q=1#a/b"
+              , "http://www.foo.com:2000/aa%2Fbb/2?q=1&k=2#a/b"
               )
             , ( "it encodes values in query"
-              , { url1 | query = Dict.empty |> Dict.insert "a/b" "c/d" }
+              , { url1 | query = [ ( "a/b", "c/d" ) ] }
               , "http://www.foo.com:2000/users/1?a%2Fb=c%2Fd#a/b"
               )
             , ( "it handles localhost which has no ."
               , { url1 | host = [ "localhost" ] }
-              , "http://localhost:2000/users/1?k=2&q=1#a/b"
+              , "http://localhost:2000/users/1?q=1&k=2#a/b"
               )
             , ( "it handles a url without host, port, path"
-              , { url2 | hash = "a/b", query = Dict.singleton "k" "1" }
+              , { url2 | hash = "a/b", query = [ ( "k", "1" ) ] }
               , "?k=1#a/b"
               )
             , ( "it handles a url with only query"
-              , { url2 | query = Dict.singleton "k" "1" }
+              , { url2 | query = [ ( "k", "1" ) ] }
               , "?k=1"
               )
             ]
@@ -500,7 +505,7 @@ testNew =
             , hasLeadingSlash = False
             , hasTrailingSlash = False
             , hash = ""
-            , query = Dict.empty
+            , query = []
             }
 
         actual =
@@ -517,13 +522,13 @@ testAddQuery =
                     |> Erl.addQuery "a" "1"
                     |> Erl.addQuery "b" "2"
                     |> .query
-              , Dict.empty |> Dict.insert "a" "1" |> Dict.insert "b" "2"
+              , [ ( "a", "1" ), ( "b", "2" ) ]
               )
             , ( Erl.new
                     |> Erl.addQuery "a" "1"
-                    |> Erl.addQuery "a" ""
+                    |> Erl.addQuery "a" "2"
                     |> .query
-              , Dict.empty
+              , [ ( "a", "1" ), ( "a", "2" ) ]
               )
             ]
 
@@ -540,9 +545,9 @@ testSetQuery =
         inputs =
             [ ( Erl.new
                     |> Erl.addQuery "a" "1"
-                    |> Erl.setQuery "b" "2"
+                    |> Erl.setQuery "a" "2"
                     |> .query
-              , Dict.singleton "b" "2"
+              , [ ( "a", "2" ) ]
               )
             ]
 
@@ -557,7 +562,7 @@ testSetQuery =
 testRemoveQuery =
     let
         expected =
-            Dict.empty |> Dict.insert "a" "1"
+            [ ( "a", "1" ) ]
 
         actual =
             Erl.new
@@ -573,7 +578,7 @@ testRemoveQuery =
 testQueryClear =
     let
         expected =
-            Dict.empty
+            []
 
         actual =
             Erl.new

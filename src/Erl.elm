@@ -34,10 +34,10 @@ import String exposing (..)
 -- TYPES
 
 
-{-| A Dict that holds keys and values for the query string
+{-| List of tuples that holds the keys and values in the query string
 -}
 type alias Query =
-    Dict.Dict String String
+    List ( String, String )
 
 
 {-| Record that holds url attributes
@@ -373,11 +373,11 @@ queryStringElementToTuple element =
 
 
 
--- "a=1&b=2" --> [("a", "1"), ("b", "2")]
+-- "a=1&b=2&a=3" --> [("a", "1"), ("b", "2"), ("a", "1")]
 
 
-queryTuples : String -> List ( String, String )
-queryTuples queryString =
+parseQuery : String -> Query
+parseQuery queryString =
     let
         splitted =
             split "&" queryString
@@ -386,11 +386,6 @@ queryTuples queryString =
             []
         else
             List.map queryStringElementToTuple splitted
-
-
-parseQuery : String -> Query
-parseQuery str =
-    Dict.fromList (queryTuples str)
 
 
 queryFromAll : String -> Query
@@ -430,16 +425,13 @@ parse str =
 queryToString : Url -> String
 queryToString url =
     let
-        tuples =
-            Dict.toList url.query
-
         encodedTuples =
-            List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) tuples
+            List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) url.query
 
         parts =
             List.map (\( a, b ) -> a ++ "=" ++ b) encodedTuples
     in
-        if Dict.isEmpty url.query then
+        if List.isEmpty url.query then
             ""
         else
             "?" ++ (join "&" parts)
@@ -539,7 +531,7 @@ new =
     , hasTrailingSlash = False
     , port_ = 0
     , hash = ""
-    , query = Dict.empty
+    , query = []
     }
 
 
@@ -549,36 +541,38 @@ new =
 -}
 clearQuery : Url -> Url
 clearQuery url =
-    { url | query = Dict.empty }
+    { url | query = [] }
 
 
-{-| Set key/value in query string
+{-| Adds key/value in query string
 
     Erl.addQuery key value url
+
+This doesn't replace existing keys, so if this is a duplicated this key is just added.
 -}
 addQuery : String -> String -> Url -> Url
 addQuery key val url =
     let
         updated =
-            if String.isEmpty val then
-                Dict.remove key url.query
-            else
-                Dict.insert key val url.query
+            url.query
+                |> List.reverse
+                |> (::) ( key, val )
+                |> List.reverse
     in
         { url | query = updated }
 
 
-{-| Set key/value in query string, removes any existing ones
+{-| Set key/value in query string, removes any existing one if necessary.
 
     Erl.setQuery key value url
 -}
 setQuery : String -> String -> Url -> Url
 setQuery key val url =
     let
-        updated =
-            Dict.singleton key val
+        without =
+            removeQuery key url
     in
-        { url | query = updated }
+        addQuery key val without
 
 
 {-| Removes key from query string
@@ -589,7 +583,7 @@ removeQuery : String -> Url -> Url
 removeQuery key url =
     let
         updated =
-            Dict.remove key url.query
+            List.filter (\( k, v ) -> k /= key) url.query
     in
         { url | query = updated }
 
