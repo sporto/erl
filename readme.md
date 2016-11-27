@@ -56,6 +56,10 @@ Erl.toString url
 "http://www.foo.com:2000/users/1?k=2&q=1#a/b"
 ```
 
+## Mutations
+
+See documentation
+
 ## Documentation
 
 [Documentation at package.elm-lang.org](http://package.elm-lang.org/packages/sporto/erl/latest/Erl)
