@@ -1,5 +1,6 @@
 # Changelog
 
+- `11.1.0`   Added `getQueryValuesForKey`
 - `11.0.0`   Change the query to `List (String, String)`. This allows the query string to hold duplicate values, which is valid.
 - `10.0.2`   Upgrade to Elm 0.18
 - `10.0.1`   `extractPort` attempts to add a default port if missing in the url
