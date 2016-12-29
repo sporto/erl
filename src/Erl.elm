@@ -1,4 +1,24 @@
-module Erl exposing (addQuery, clearQuery, extractHash, extractHost, extractPath, extractPort, extractProtocol, extractQuery, new, parse, removeQuery, setQuery, appendPathSegments, toString, queryToString, Url, Query)
+module Erl
+    exposing
+        ( addQuery
+        , appendPathSegments
+        , clearQuery
+        , extractHash
+        , extractHost
+        , extractPath
+        , extractPort
+        , extractProtocol
+        , extractQuery
+        , getQueryValuesForKey
+        , new
+        , parse
+        , Query
+        , queryToString
+        , removeQuery
+        , setQuery
+        , toString
+        , Url
+        )
 
 {-| Library for parsing and constructing URLs
 
@@ -22,6 +42,9 @@ module Erl exposing (addQuery, clearQuery, extractHash, extractHost, extractPath
 
 # Serialization helpers
 @docs queryToString
+
+# Other helpers
+@docs getQueryValuesForKey
 
 -}
 
@@ -586,6 +609,19 @@ removeQuery key url =
             List.filter (\( k, v ) -> k /= key) url.query
     in
         { url | query = updated }
+
+
+{-| Gets values for a key in the query
+
+    Erl.getQueryValuesForKey "a" url
+
+    == ["1", "2"]
+-}
+getQueryValuesForKey : String -> Url -> List String
+getQueryValuesForKey key url =
+    url.query
+        |> List.filter (\( k, _ ) -> k == key)
+        |> List.map Tuple.second
 
 
 {-| Append some path segments to a url

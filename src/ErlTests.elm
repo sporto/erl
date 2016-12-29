@@ -590,6 +590,27 @@ testQueryClear =
             <| \() -> Expect.equal expected actual
 
 
+testGetQueryValuesForKey =
+    let
+        url =
+            Erl.parse "?a=1&b=2&a=3"
+
+        input =
+            [ ( "a", [ "1", "3" ] )
+            , ( "c", [] )
+            ]
+
+        run ( key, expected ) =
+            let
+                actual =
+                    Erl.getQueryValuesForKey key url
+            in
+                test "getQueryValuesForKey"
+                    <| \() -> Expect.equal expected actual
+    in
+        describe "Gets query values" <| List.map run input
+
+
 testPathEdgeCase =
     let
         expected =
@@ -613,22 +634,23 @@ all =
     describe "Tests"
         [ testAddQuery
         , testAppendPathSegments
+        , testGetQueryValuesForKey
         , testHash
         , testHashExtract
+        , testHasLeadingSlash
+        , testHasTrailingSlash
         , testHost
         , testHostExtract
         , testNew
         , testPath
+        , testPathEdgeCase
         , testPathExtract
-        , testHasLeadingSlash
-        , testHasTrailingSlash
         , testPort
         , testPortExtract
         , testProtocol
         , testProtocolExtract
         , testQuery
         , testQueryClear
-        , testPathEdgeCase
         , testQueryExtract
         , testQueryToString
         , testRemoveQuery
