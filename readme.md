@@ -14,20 +14,19 @@ Erl.parse url
 
 -- Returns a Erl.Url record:
 
-{
-  protocol: "http",
-  username: "sam",
-  password: "pass",
-  host: ["api", "example", "com"],
-  port_: 3000,
-  path: ["products", "kids"],
-  hash: "toys/1",
-  hasLeadingSlash: True,
-  hasTrailingSlash: False,
-  query: Dict {
-    "color": "red",
-    "age": "10"
-  }
+{ protocol: "http"
+,  username: "sam"
+,  password: "pass"
+,  host: ["api", "example", "com"]
+,  port_: 3000
+,  path: ["products", "kids"]
+,  hash: "toys/1"
+,  hasLeadingSlash: True
+,  hasTrailingSlash: False
+,  query: 
+     [ ("color", "red")
+     , ("age", "10")
+     ]
 }
 ```
 
