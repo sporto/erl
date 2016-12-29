@@ -613,9 +613,11 @@ removeQuery key url =
 
 {-| Gets values for a key in the query
 
+    url = Erl.parse "?a=1&b=2&a=3"
+
     Erl.getQueryValuesForKey "a" url
 
-    == ["1", "2"]
+    == ["1", "3"]
 -}
 getQueryValuesForKey : String -> Url -> List String
 getQueryValuesForKey key url =
