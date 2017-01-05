@@ -1,5 +1,6 @@
 # Changelog
 
+- `11.1.1`   Extract Host without a TLD
 - `11.1.0`   Added `getQueryValuesForKey`
 - `11.0.0`   Change the query to `List (String, String)`. This allows the query string to hold duplicate values, which is valid.
 - `10.0.2`   Upgrade to Elm 0.18
