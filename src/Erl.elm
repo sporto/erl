@@ -190,36 +190,34 @@ extractProtocol str =
 
 
 -- HOST
+-- valid host: a-z 0-9 and -
 
 
 {-| Extract the host from the url
 
 -}
-
-
-
--- valid host: a-z 0-9 and -
-
-
 extractHost : String -> String
 extractHost str =
-    let
-        dotsRx =
-            "((\\w|-)+\\.)+(\\w|-)+"
-
-        localhostRx =
-            "localhost"
-
-        rx =
-            "(" ++ dotsRx ++ "|" ++ localhostRx ++ ")"
-    in
+    -- if str has // then we can assume that what follows is the host
+    -- if it doesn't then look for tld
+    if String.contains "//" str then
         str
             |> rightFromOrSame "//"
             |> leftFromOrSame "/"
-            |> Regex.find (Regex.AtMost 1) (Regex.regex rx)
-            |> List.map .match
-            |> List.head
-            |> Maybe.withDefault ""
+            |> leftFromOrSame ":"
+    else
+        let
+            -- Look for something with a dot e.g. host.tld
+            rx =
+                "((\\w|-)+\\.)+(\\w|-)+"
+        in
+            str
+                |> rightFromOrSame "//"
+                |> leftFromOrSame "/"
+                |> Regex.find (Regex.AtMost 1) (Regex.regex rx)
+                |> List.map .match
+                |> List.head
+                |> Maybe.withDefault ""
 
 
 parseHost : String -> List String
