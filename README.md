@@ -10,7 +10,7 @@ A URL parsing and construction library for ELM
 -- Given a url string
 url = "http://sam:pass@api.example.com:3000/products/kids?color=red&age=10#toys/1"
 
-Erl.parse url 
+Erl.parse url
 
 -- Returns a Erl.Url record:
 
@@ -67,7 +67,7 @@ See documentation
 
 ```
 yarn install
-npm test
+yarn test
 ```
 
 ## Todo
