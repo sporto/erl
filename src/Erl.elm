@@ -22,28 +22,44 @@ module Erl
 
 {-| Library for parsing and constructing URLs
 
+
 # Types
+
 @docs Url, Query
 
+
 # Parse
+
 @docs parse
 
+
 # Parse helpers
+
 @docs extractHash, extractHost, extractPath, extractProtocol, extractPort, extractQuery
 
+
 # Construct
+
 @docs new
 
+
 # Mutation helpers
+
 @docs addQuery, setQuery, removeQuery, clearQuery, appendPathSegments
 
+
 # Serialize
+
 @docs toString
 
+
 # Serialization helpers
+
 @docs queryToString
 
+
 # Other helpers
+
 @docs getQueryValuesForKey
 
 -}
@@ -172,7 +188,6 @@ leftFrom delimiter str =
 
 
 {-| Extract the protocol from the url
-
 -}
 extractProtocol : String -> String
 extractProtocol str =
@@ -194,7 +209,6 @@ extractProtocol str =
 
 
 {-| Extract the host from the url
-
 -}
 extractHost : String -> String
 extractHost str =
@@ -288,7 +302,6 @@ extractPort str =
 
 
 {-| Extract the path from the url
-
 -}
 extractPath : String -> String
 extractPath str =
@@ -333,7 +346,6 @@ hasTrailingSlashFromAll str =
 
 
 {-| Extract the hash (hash) from the url
-
 -}
 extractHash : String -> String
 extractHash str =
@@ -354,7 +366,6 @@ hashFromAll str =
 
 
 {-| Extract the query string from the url
-
 -}
 extractQuery : String -> String
 extractQuery str =
@@ -419,6 +430,7 @@ queryFromAll all =
 {-| Parse a url string, returns an Erl.Url record
 
     Erl.parse "http://api.example.com/users/1#x/1?a=1" == Erl.Url{...}
+
 -}
 parse : String -> Url
 parse str =
@@ -441,18 +453,19 @@ parse str =
 
 {-| Convert to a string only the query component of an url, this includes '?'
 
-    Erl.queryToString url == "?a=1&b=2"
+    Erl.queryToString url.query == "?a=1&b=2"
+
 -}
-queryToString : Url -> String
-queryToString url =
+queryToString : Query -> String
+queryToString query =
     let
         encodedTuples =
-            List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) url.query
+            List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) query
 
         parts =
             List.map (\( a, b ) -> a ++ "=" ++ b) encodedTuples
     in
-        if List.isEmpty url.query then
+        if List.isEmpty query then
             ""
         else
             "?" ++ (join "&" parts)
@@ -514,7 +527,8 @@ trailingSlashComponent url =
 
 {-| Convert to a string the hash component of an url, this includes '#'
 
-    queryToString url == "#a/b"
+    hashToString url == "#a/b"
+
 -}
 hashToString : Url -> String
 hashToString url =
@@ -559,6 +573,7 @@ new =
 {-| Clears the current query string
 
     Erl.clearQuery url
+
 -}
 clearQuery : Url -> Url
 clearQuery url =
@@ -570,6 +585,7 @@ clearQuery url =
     Erl.addQuery key value url
 
 This doesn't replace existing keys, so if this is a duplicated this key is just added.
+
 -}
 addQuery : String -> String -> Url -> Url
 addQuery key val url =
@@ -586,6 +602,7 @@ addQuery key val url =
 {-| Set key/value in query string, removes any existing one if necessary.
 
     Erl.setQuery key value url
+
 -}
 setQuery : String -> String -> Url -> Url
 setQuery key val url =
@@ -599,6 +616,7 @@ setQuery key val url =
 {-| Removes key from query string
 
     Erl.removeQuery key url
+
 -}
 removeQuery : String -> Url -> Url
 removeQuery key url =
@@ -616,6 +634,7 @@ removeQuery key url =
     Erl.getQueryValuesForKey "a" url
 
     == ["1", "3"]
+
 -}
 getQueryValuesForKey : String -> Url -> List String
 getQueryValuesForKey key url =
@@ -627,6 +646,7 @@ getQueryValuesForKey key url =
 {-| Append some path segments to a url
 
     Erl.appendPathSegments ["hello", "world"] url
+
 -}
 appendPathSegments : List String -> Url -> Url
 appendPathSegments segments url =
