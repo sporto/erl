@@ -371,55 +371,30 @@ hashFromAll str =
 -}
 extractQuery : String -> String
 extractQuery str =
-    str
-        |> split "?"
-        |> List.drop 1
-        |> List.head
-        |> Maybe.withDefault ""
-        |> split "#"
-        |> List.head
-        |> Maybe.withDefault ""
-
-
-
--- "a=1" --> ("a", "1")
-
-
-queryStringElementToTuple : String -> ( String, String )
-queryStringElementToTuple element =
     let
-        splitted =
-            split "=" element
-
-        first =
-            Maybe.withDefault "" (List.head splitted)
-
-        firstDecoded =
-            Http.decodeUri first |> Maybe.withDefault ""
-
-        second =
-            Maybe.withDefault "" (List.head (List.drop 1 splitted))
-
-        secondDecoded =
-            Http.decodeUri second |> Maybe.withDefault ""
+        query =
+            str
+                |> split "?"
+                |> List.drop 1
+                |> List.head
+                |> Maybe.withDefault ""
+                |> split "#"
+                |> List.head
+                |> Maybe.withDefault ""
     in
-        ( firstDecoded, secondDecoded )
+        if String.isEmpty query then
+            ""
+        else
+            "?" ++ query
 
 
 
--- "a=1&b=2&a=3" --> [("a", "1"), ("b", "2"), ("a", "1")]
+-- "?a=1&b=2&a=3" --> [("a", "1"), ("b", "2"), ("a", "1")]
 
 
 parseQuery : String -> Query
-parseQuery queryString =
-    let
-        splitted =
-            split "&" queryString
-    in
-        if String.isEmpty queryString then
-            []
-        else
-            List.map queryStringElementToTuple splitted
+parseQuery =
+    Erl.Query.parse
 
 
 queryFromAll : String -> Query

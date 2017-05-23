@@ -1,6 +1,7 @@
 module Erl.Query
     exposing
-        ( toString
+        ( parse
+        , toString
         , add
         , set
         , remove
@@ -9,22 +10,76 @@ module Erl.Query
 
 {-| Library for parsing and constructing URLs
 
+
+# Parse
+
+@docs parse
+
+
 # Mutation helpers
 
 @docs add, set, remove
+
 
 # Serialize
 
 @docs toString
 
+
 # Other helpers
 
 @docs getValuesForKey
+
 -}
 
 import Erl.Types as Types
 import Http
 import String
+
+
+-- "?a=1&b=2&a=3" --> [("a", "1"), ("b", "2"), ("a", "1")]
+
+
+parse : String -> Types.Query
+parse queryString =
+    let
+        trimmed =
+            queryString
+                |> String.split "?"
+                |> String.join ""
+
+        splitted =
+            String.split "&" trimmed
+    in
+        if String.isEmpty trimmed then
+            []
+        else
+            List.map queryStringElementToTuple splitted
+
+
+
+-- "a=1" --> ("a", "1")
+
+
+queryStringElementToTuple : String -> ( String, String )
+queryStringElementToTuple element =
+    let
+        splitted =
+            String.split "=" element
+
+        first =
+            Maybe.withDefault "" (List.head splitted)
+
+        firstDecoded =
+            Http.decodeUri first |> Maybe.withDefault ""
+
+        second =
+            Maybe.withDefault "" (List.head (List.drop 1 splitted))
+
+        secondDecoded =
+            Http.decodeUri second |> Maybe.withDefault ""
+    in
+        ( firstDecoded, secondDecoded )
 
 
 {-| Convert to a string only the query component of an url, this includes '?'

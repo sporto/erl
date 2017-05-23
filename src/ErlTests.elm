@@ -317,8 +317,9 @@ testHash =
 testQueryExtract =
     let
         inputs =
-            [ ( "http://foo.com/users?a=1", "a=1" )
-            , ( "http://foo.com/users?a=1#/users", "a=1" )
+            [ ( "http://foo.com/users", "" )
+            , ( "http://foo.com/users?a=1", "?a=1" )
+            , ( "http://foo.com/users?a=1#/users", "?a=1" )
             ]
 
         run ( input, expected ) =
@@ -635,7 +636,7 @@ testPathEdgeCase =
 
 all : Test
 all =
-    describe "Tests"
+    describe "Erl Tests"
         [ testAddQuery
         , testAppendPathSegments
         , testGetQueryValuesForKey
