@@ -8,7 +8,7 @@ module Erl.Query
         , getValuesForKey
         )
 
-{-| Library for parsing and constructing URLs
+{-| Functions to work with a Query record
 
 
 # Parse
