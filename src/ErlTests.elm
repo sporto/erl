@@ -329,7 +329,7 @@ testQueryExtract =
             (List.map run inputs)
 
 
-testQuery =
+testQueryParsing =
     let
         inputs =
             [ ( "users?a=1&b=2", [ ( "a", "1" ), ( "b", "2" ) ] )
@@ -358,7 +358,7 @@ testQueryToString =
                     Erl.parse input
 
                 actual =
-                    Erl.queryToString url.query
+                    Erl.queryToString url
             in
                 test ("queryToString " ++ input) <|
                     \() -> Expect.equal expected actual
@@ -653,7 +653,7 @@ all =
         , testPortExtract
         , testProtocol
         , testProtocolExtract
-        , testQuery
+        , testQueryParsing
         , testQueryClear
         , testQueryExtract
         , testQueryToString

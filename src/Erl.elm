@@ -65,6 +65,8 @@ module Erl
 -}
 
 import Dict
+import Erl.Query
+import Erl.Types as Types
 import Http
 import Regex
 import String exposing (..)
@@ -76,7 +78,7 @@ import String exposing (..)
 {-| List of tuples that holds the keys and values in the query string
 -}
 type alias Query =
-    List ( String, String )
+    Types.Query
 
 
 {-| Record that holds url attributes
@@ -453,22 +455,13 @@ parse str =
 
 {-| Convert to a string only the query component of an url, this includes '?'
 
-    Erl.queryToString url.query == "?a=1&b=2"
+    Erl.queryToString url == "?a=1&b=2"
 
 -}
-queryToString : Query -> String
-queryToString query =
-    let
-        encodedTuples =
-            List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) query
-
-        parts =
-            List.map (\( a, b ) -> a ++ "=" ++ b) encodedTuples
-    in
-        if List.isEmpty query then
-            ""
-        else
-            "?" ++ (join "&" parts)
+queryToString : Url -> String
+queryToString =
+    .query
+        >> Erl.Query.toString
 
 
 protocolComponent : Url -> String
@@ -589,14 +582,7 @@ This doesn't replace existing keys, so if this is a duplicated this key is just 
 -}
 addQuery : String -> String -> Url -> Url
 addQuery key val url =
-    let
-        updated =
-            url.query
-                |> List.reverse
-                |> (::) ( key, val )
-                |> List.reverse
-    in
-        { url | query = updated }
+    { url | query = Erl.Query.add key val url.query }
 
 
 {-| Set key/value in query string, removes any existing one if necessary.
@@ -606,11 +592,7 @@ addQuery key val url =
 -}
 setQuery : String -> String -> Url -> Url
 setQuery key val url =
-    let
-        without =
-            removeQuery key url
-    in
-        addQuery key val without
+    { url | query = Erl.Query.set key val url.query }
 
 
 {-| Removes key from query string
@@ -620,11 +602,7 @@ setQuery key val url =
 -}
 removeQuery : String -> Url -> Url
 removeQuery key url =
-    let
-        updated =
-            List.filter (\( k, v ) -> k /= key) url.query
-    in
-        { url | query = updated }
+    { url | query = Erl.Query.remove key url.query }
 
 
 {-| Gets values for a key in the query
@@ -638,9 +616,7 @@ removeQuery key url =
 -}
 getQueryValuesForKey : String -> Url -> List String
 getQueryValuesForKey key url =
-    url.query
-        |> List.filter (\( k, _ ) -> k == key)
-        |> List.map Tuple.second
+    Erl.Query.getValuesForKey key url.query
 
 
 {-| Append some path segments to a url
@@ -693,7 +669,7 @@ toString url =
             trailingSlashComponent url
 
         query_ =
-            queryToString url.query
+            queryToString url
 
         hash =
             hashToString url
