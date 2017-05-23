@@ -37,9 +37,11 @@ import Http
 import String
 
 
--- "?a=1&b=2&a=3" --> [("a", "1"), ("b", "2"), ("a", "1")]
+{-| Parse a query string
 
+    Erl.Query.parse "?a=1&b=2&a=3" == [("a", "1"), ("b", "2"), ("a", "1")]
 
+-}
 parse : String -> Types.Query
 parse queryString =
     let
@@ -82,9 +84,9 @@ queryStringElementToTuple element =
         ( firstDecoded, secondDecoded )
 
 
-{-| Convert to a string only the query component of an url, this includes '?'
+{-| Convert to a string, this includes '?'
 
-    Erl.Query.toString url.query == "?a=1&b=2"
+    Erl.Query.toString query == "?a=1&b=2"
 
 -}
 toString : Types.Query -> String
