@@ -693,7 +693,7 @@ toString url =
             trailingSlashComponent url
 
         query_ =
-            queryToString url
+            queryToString url.query
 
         hash =
             hashToString url

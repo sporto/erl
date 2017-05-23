@@ -1,13 +1,12 @@
-port module Main exposing (..)
+module Main exposing (..)
 
-import Test.Runner.Node exposing (run, TestProgram)
 import Json.Encode exposing (Value)
 import ErlTests
+import Test exposing (..)
 
 
-main : TestProgram
-main =
-    run emit ErlTests.all
-
-
-port emit : ( String, Value ) -> Cmd msg
+all : Test
+all =
+    describe "all"
+        [ ErlTests.all
+        ]
