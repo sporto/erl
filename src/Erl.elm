@@ -17,6 +17,7 @@ module Erl
         , removeQuery
         , setQuery
         , toString
+        , toAbsoluteString
         , Url
         )
 
@@ -50,7 +51,7 @@ module Erl
 
 # Serialize
 
-@docs toString
+@docs toString, toAbsoluteString
 
 
 # Serialization helpers
@@ -608,7 +609,7 @@ appendPathSegments segments url =
         { url | path = newPath }
 
 
-{-| Generate url string from an Erl.Url record
+{-| Generate a url string from an Erl.Url record
 
     url = { protocol = "http",
           , username = "",
@@ -636,7 +637,30 @@ toString url =
 
         port_ =
             portComponent url
+    in
+        protocol_ ++ host_ ++ port_ ++ toAbsoluteString url
 
+
+{-| Generate a url that starts at the path
+
+    url = { protocol = "http",
+          , username = "",
+          , password = "",
+          , host = ["www", "foo", "com"],
+          , path = ["users", "1"],
+          , hasLeadingSlash = False
+          , hasTrailingSlash = False
+          , port_ = 2000,
+          , hash = "a/b",
+          , query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
+          }
+
+    Erl.toAbsoluteString url == "/users/1?k=2&q=1#a/b"
+
+-}
+toAbsoluteString : Url -> String
+toAbsoluteString url =
+    let
         path_ =
             pathComponent url
 
@@ -649,4 +673,4 @@ toString url =
         hash =
             hashToString url
     in
-        protocol_ ++ host_ ++ port_ ++ path_ ++ trailingSlash_ ++ query_ ++ hash
+        path_ ++ trailingSlash_ ++ query_ ++ hash
