@@ -17,6 +17,7 @@ module Erl
         , removeQuery
         , setQuery
         , toString
+        , toAbsoluteString
         , Url
         )
 
@@ -50,7 +51,7 @@ module Erl
 
 # Serialize
 
-@docs toString
+@docs toString, toAbsoluteString
 
 
 # Serialization helpers
@@ -65,6 +66,8 @@ module Erl
 -}
 
 import Dict
+import Erl.Query
+import Erl.Types as Types
 import Http
 import Regex
 import String exposing (..)
@@ -76,7 +79,7 @@ import String exposing (..)
 {-| List of tuples that holds the keys and values in the query string
 -}
 type alias Query =
-    List ( String, String )
+    Types.Query
 
 
 {-| Record that holds url attributes
@@ -369,55 +372,30 @@ hashFromAll str =
 -}
 extractQuery : String -> String
 extractQuery str =
-    str
-        |> split "?"
-        |> List.drop 1
-        |> List.head
-        |> Maybe.withDefault ""
-        |> split "#"
-        |> List.head
-        |> Maybe.withDefault ""
-
-
-
--- "a=1" --> ("a", "1")
-
-
-queryStringElementToTuple : String -> ( String, String )
-queryStringElementToTuple element =
     let
-        splitted =
-            split "=" element
-
-        first =
-            Maybe.withDefault "" (List.head splitted)
-
-        firstDecoded =
-            Http.decodeUri first |> Maybe.withDefault ""
-
-        second =
-            Maybe.withDefault "" (List.head (List.drop 1 splitted))
-
-        secondDecoded =
-            Http.decodeUri second |> Maybe.withDefault ""
+        query =
+            str
+                |> split "?"
+                |> List.drop 1
+                |> List.head
+                |> Maybe.withDefault ""
+                |> split "#"
+                |> List.head
+                |> Maybe.withDefault ""
     in
-        ( firstDecoded, secondDecoded )
+        if String.isEmpty query then
+            ""
+        else
+            "?" ++ query
 
 
 
--- "a=1&b=2&a=3" --> [("a", "1"), ("b", "2"), ("a", "1")]
+-- "?a=1&b=2&a=3" --> [("a", "1"), ("b", "2"), ("a", "1")]
 
 
 parseQuery : String -> Query
-parseQuery queryString =
-    let
-        splitted =
-            split "&" queryString
-    in
-        if String.isEmpty queryString then
-            []
-        else
-            List.map queryStringElementToTuple splitted
+parseQuery =
+    Erl.Query.parse
 
 
 queryFromAll : String -> Query
@@ -453,22 +431,13 @@ parse str =
 
 {-| Convert to a string only the query component of an url, this includes '?'
 
-    Erl.queryToString url.query == "?a=1&b=2"
+    Erl.queryToString url == "?a=1&b=2"
 
 -}
-queryToString : Query -> String
-queryToString query =
-    let
-        encodedTuples =
-            List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) query
-
-        parts =
-            List.map (\( a, b ) -> a ++ "=" ++ b) encodedTuples
-    in
-        if List.isEmpty query then
-            ""
-        else
-            "?" ++ (join "&" parts)
+queryToString : Url -> String
+queryToString =
+    .query
+        >> Erl.Query.toString
 
 
 protocolComponent : Url -> String
@@ -589,14 +558,7 @@ This doesn't replace existing keys, so if this is a duplicated this key is just 
 -}
 addQuery : String -> String -> Url -> Url
 addQuery key val url =
-    let
-        updated =
-            url.query
-                |> List.reverse
-                |> (::) ( key, val )
-                |> List.reverse
-    in
-        { url | query = updated }
+    { url | query = Erl.Query.add key val url.query }
 
 
 {-| Set key/value in query string, removes any existing one if necessary.
@@ -606,11 +568,7 @@ addQuery key val url =
 -}
 setQuery : String -> String -> Url -> Url
 setQuery key val url =
-    let
-        without =
-            removeQuery key url
-    in
-        addQuery key val without
+    { url | query = Erl.Query.set key val url.query }
 
 
 {-| Removes key from query string
@@ -620,11 +578,7 @@ setQuery key val url =
 -}
 removeQuery : String -> Url -> Url
 removeQuery key url =
-    let
-        updated =
-            List.filter (\( k, v ) -> k /= key) url.query
-    in
-        { url | query = updated }
+    { url | query = Erl.Query.remove key url.query }
 
 
 {-| Gets values for a key in the query
@@ -638,9 +592,7 @@ removeQuery key url =
 -}
 getQueryValuesForKey : String -> Url -> List String
 getQueryValuesForKey key url =
-    url.query
-        |> List.filter (\( k, _ ) -> k == key)
-        |> List.map Tuple.second
+    Erl.Query.getValuesForKey key url.query
 
 
 {-| Append some path segments to a url
@@ -657,7 +609,7 @@ appendPathSegments segments url =
         { url | path = newPath }
 
 
-{-| Generate url string from an Erl.Url record
+{-| Generate a url string from an Erl.Url record
 
     url = { protocol = "http",
           , username = "",
@@ -685,7 +637,30 @@ toString url =
 
         port_ =
             portComponent url
+    in
+        protocol_ ++ host_ ++ port_ ++ toAbsoluteString url
 
+
+{-| Generate a url that starts at the path
+
+    url = { protocol = "http",
+          , username = "",
+          , password = "",
+          , host = ["www", "foo", "com"],
+          , path = ["users", "1"],
+          , hasLeadingSlash = False
+          , hasTrailingSlash = False
+          , port_ = 2000,
+          , hash = "a/b",
+          , query = Dict.empty |> Dict.insert "q" "1" |> Dict.insert "k" "2"
+          }
+
+    Erl.toAbsoluteString url == "/users/1?k=2&q=1#a/b"
+
+-}
+toAbsoluteString : Url -> String
+toAbsoluteString url =
+    let
         path_ =
             pathComponent url
 
@@ -693,9 +668,9 @@ toString url =
             trailingSlashComponent url
 
         query_ =
-            queryToString url.query
+            queryToString url
 
         hash =
             hashToString url
     in
-        protocol_ ++ host_ ++ port_ ++ path_ ++ trailingSlash_ ++ query_ ++ hash
+        path_ ++ trailingSlash_ ++ query_ ++ hash

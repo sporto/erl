@@ -246,8 +246,8 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
 
 elm-test@beta:
-  version "0.18.3-beta15"
-  resolved "https://registry.yarnpkg.com/elm-test/-/elm-test-0.18.3-beta15.tgz#65fc2bbd7cd10ef4168979fc78ab83f01a7d5751"
+  version "0.18.3-beta16"
+  resolved "https://registry.yarnpkg.com/elm-test/-/elm-test-0.18.3-beta16.tgz#ce5fd93aed882c15e256119cc1492da63c14d589"
   dependencies:
     binstall "1.2.0"
     chalk "1.1.3"

@@ -317,8 +317,9 @@ testHash =
 testQueryExtract =
     let
         inputs =
-            [ ( "http://foo.com/users?a=1", "a=1" )
-            , ( "http://foo.com/users?a=1#/users", "a=1" )
+            [ ( "http://foo.com/users", "" )
+            , ( "http://foo.com/users?a=1", "?a=1" )
+            , ( "http://foo.com/users?a=1#/users", "?a=1" )
             ]
 
         run ( input, expected ) =
@@ -329,7 +330,7 @@ testQueryExtract =
             (List.map run inputs)
 
 
-testQuery =
+testQueryParsing =
     let
         inputs =
             [ ( "users?a=1&b=2", [ ( "a", "1" ), ( "b", "2" ) ] )
@@ -358,7 +359,7 @@ testQueryToString =
                     Erl.parse input
 
                 actual =
-                    Erl.queryToString url.query
+                    Erl.queryToString url
             in
                 test ("queryToString " ++ input) <|
                     \() -> Expect.equal expected actual
@@ -465,6 +466,79 @@ testToString =
                 test testCase <| \() -> result
     in
         describe "toString"
+            (List.map run inputs)
+
+
+testToAbsoluteString =
+    let
+        url1 =
+            { protocol = "http"
+            , username = ""
+            , password = ""
+            , host = [ "www", "foo", "com" ]
+            , path = [ "users", "1" ]
+            , hasLeadingSlash = True
+            , hasTrailingSlash = False
+            , port_ = 2000
+            , hash = "a/b"
+            , query = [ ( "q", "1" ), ( "k", "2" ) ]
+            }
+
+        url2 =
+            { protocol = ""
+            , username = ""
+            , password = ""
+            , host = []
+            , port_ = 0
+            , path = []
+            , hasLeadingSlash = False
+            , hasTrailingSlash = False
+            , hash = ""
+            , query = []
+            }
+
+        inputs =
+            [ ( "it converts to string"
+              , url1
+              , "/users/1?q=1&k=2#a/b"
+              )
+            , ( "it can have a trailing slash"
+              , { url1 | hasTrailingSlash = True }
+              , "/users/1/?q=1&k=2#a/b"
+              )
+            , ( "it doesn't add # when hash is empty"
+              , { url1 | hash = "" }
+              , "/users/1?q=1&k=2"
+              )
+            , ( "it doesn't add query when query is empty"
+              , { url1 | query = [] }
+              , "/users/1#a/b"
+              )
+            , ( "it encodes values in path"
+              , { url1 | path = [ "aa/bb", "2" ] }
+              , "/aa%2Fbb/2?q=1&k=2#a/b"
+              )
+            , ( "it encodes values in query"
+              , { url1 | query = [ ( "a/b", "c/d" ) ] }
+              , "/users/1?a%2Fb=c%2Fd#a/b"
+              )
+            , ( "it handles a url with only query"
+              , { url2 | query = [ ( "k", "1" ) ] }
+              , "?k=1"
+              )
+            ]
+
+        run ( testCase, input, expected ) =
+            let
+                actual =
+                    Erl.toAbsoluteString input
+
+                result =
+                    Expect.equal expected actual
+            in
+                test testCase <| \() -> result
+    in
+        describe "toAbsoluteString"
             (List.map run inputs)
 
 
@@ -635,7 +709,7 @@ testPathEdgeCase =
 
 all : Test
 all =
-    describe "Tests"
+    describe "Erl Tests"
         [ testAddQuery
         , testAppendPathSegments
         , testGetQueryValuesForKey
@@ -653,7 +727,7 @@ all =
         , testPortExtract
         , testProtocol
         , testProtocolExtract
-        , testQuery
+        , testQueryParsing
         , testQueryClear
         , testQueryExtract
         , testQueryToString
@@ -661,4 +735,5 @@ all =
         , testRoundTrips
         , testSetQuery
         , testToString
+        , testToAbsoluteString
         ]
