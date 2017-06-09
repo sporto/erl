@@ -173,6 +173,7 @@ testPathExtract =
             , ( "users/index.html#xyz", "users/index.html" )
             , ( "users/index.html?a=1", "users/index.html" )
             , ( "http://example.com:2000", "" )
+            , ( "http://[^a](a+)+$/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab", "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab" )
             ]
 
         run ( input, expected ) =
