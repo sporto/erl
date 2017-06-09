@@ -77,6 +77,7 @@ testHostExtract =
             , ( "users/index.html", "" )
             , ( "/users/index.html", "" )
             , ( "/foo//bar.txt", "" )
+            , ( "file:///foo/bar", "" )
             ]
 
         run ( input, expected ) =
@@ -182,6 +183,7 @@ testPathExtract =
             , ( "users/index.html?a=1", "users/index.html" )
             , ( "http://example.com:2000", "" )
             , ( "http://[^a](a+)+$/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab", "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab" )
+            , ( "file:///foo/bar", "/foo/bar" )
             ]
 
         run ( input, expected ) =
