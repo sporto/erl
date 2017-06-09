@@ -316,7 +316,7 @@ extractPath str =
             |> rightFromOrSame "//"
             |> leftFromOrSame "?"
             |> leftFromOrSame "#"
-            |> Regex.replace (Regex.AtMost 1) (Regex.regex host) (\_ -> "")
+            |> Regex.replace (Regex.AtMost 1) (Regex.regex (Regex.escape host)) (\_ -> "")
             |> Regex.replace (Regex.AtMost 1) (Regex.regex ":\\d+") (\_ -> "")
 
 
