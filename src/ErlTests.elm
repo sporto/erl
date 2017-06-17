@@ -65,13 +65,19 @@ testHostExtract =
             , ( "http://notld", "notld" )
             , ( "http://notld:80", "notld" )
             , ( "http://notld/users", "notld" )
+            , ( "http://foo.com/bar//baz.txt", "foo.com" )
+            , ( "//foo.com/bar/baz.txt", "foo.com" )
+            , ( "//foo.com/bar//baz.txt", "foo.com" )
             , ( "foo.com", "foo.com" )
             , ( "foo-.com", "foo-.com" )
             , ( "foo.com/users", "foo.com" )
             , ( "api.foo.com", "api.foo.com" )
+            , ( "foo.com/bar//baz", "foo.com" )
             , ( "users/1/edit", "" )
             , ( "users/index.html", "" )
             , ( "/users/index.html", "" )
+            , ( "/foo//bar.txt", "" )
+            , ( "file:///foo/bar", "" )
             ]
 
         run ( input, expected ) =
@@ -165,14 +171,19 @@ testPathExtract =
     let
         inputs =
             [ ( "http://foo.com/users/index.html", "/users/index.html" )
+            , ( "http://foo.com/users//index.html", "/users//index.html" )
             , ( "//foo.com/users/index.html", "/users/index.html" )
             , ( "http://localhost/users/index.html", "/users/index.html" )
             , ( "//localhost/localhost/users/index.html", "/localhost/users/index.html" )
+            , ( "//localhost/localhost/users//index.html", "/localhost/users//index.html" )
+            , ( "foo.com/users//index.html", "/users//index.html" )
             , ( "/users/index.html", "/users/index.html" )
             , ( "users/index.html", "users/index.html" )
             , ( "users/index.html#xyz", "users/index.html" )
             , ( "users/index.html?a=1", "users/index.html" )
             , ( "http://example.com:2000", "" )
+            , ( "http://[^a](a+)+$/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab", "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab" )
+            , ( "file:///foo/bar", "/foo/bar" )
             ]
 
         run ( input, expected ) =

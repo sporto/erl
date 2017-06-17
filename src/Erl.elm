@@ -131,6 +131,26 @@ rightFrom delimiter str =
                     |> Maybe.withDefault ""
 
 
+rightFromLeftMost : String -> String -> String
+rightFromLeftMost delimiter str =
+    let
+        parts =
+            split delimiter str
+    in
+        case List.length parts of
+            0 ->
+                ""
+
+            1 ->
+                ""
+
+            _ ->
+                parts
+                    |> List.tail
+                    |> Maybe.withDefault []
+                    |> join delimiter
+
+
 rightFromOrSame : String -> String -> String
 rightFromOrSame delimiter str =
     let
@@ -215,26 +235,40 @@ extractProtocol str =
 -}
 extractHost : String -> String
 extractHost str =
-    -- if str has // then we can assume that what follows is the host
+    -- if str starts with // or contains :// then we can assume that what follows is the host
     -- if it doesn't then look for tld
-    if String.contains "//" str then
-        str
-            |> rightFromOrSame "//"
-            |> leftFromOrSame "/"
-            |> leftFromOrSame ":"
+    let
+        delim = schemeHostDelim str
+    in
+        case delim of
+            Just delim ->
+                str
+                    |> rightFromLeftMost delim
+                    |> leftFromOrSame "/"
+                    |> leftFromOrSame ":"
+
+            Nothing ->
+                let
+                    -- Look for something with a dot e.g. host.tld
+                    rx =
+                        "((\\w|-)+\\.)+(\\w|-)+"
+                in
+                    str
+                        |> leftFromOrSame "/"
+                        |> Regex.find (Regex.AtMost 1) (Regex.regex rx)
+                        |> List.map .match
+                        |> List.head
+                        |> Maybe.withDefault ""
+
+
+schemeHostDelim : String -> Maybe String
+schemeHostDelim str =
+    if String.startsWith "//" str then
+        Just "//"
+    else if String.contains "://" str then
+        Just "://"
     else
-        let
-            -- Look for something with a dot e.g. host.tld
-            rx =
-                "((\\w|-)+\\.)+(\\w|-)+"
-        in
-            str
-                |> rightFromOrSame "//"
-                |> leftFromOrSame "/"
-                |> Regex.find (Regex.AtMost 1) (Regex.regex rx)
-                |> List.map .match
-                |> List.head
-                |> Maybe.withDefault ""
+        Nothing
 
 
 parseHost : String -> List String
@@ -311,13 +345,22 @@ extractPath str =
     let
         host =
             extractHost str
+
+        delim =
+            schemeHostDelim str
+
+        trimmed =
+            case delim of
+                Just delim ->
+                    rightFromLeftMost delim str
+
+                Nothing ->
+                    str
     in
-        str
-            |> rightFromOrSame "//"
+        trimmed
             |> leftFromOrSame "?"
             |> leftFromOrSame "#"
-            |> Regex.replace (Regex.AtMost 1) (Regex.regex host) (\_ -> "")
-            |> Regex.replace (Regex.AtMost 1) (Regex.regex ":\\d+") (\_ -> "")
+            |> Regex.replace (Regex.AtMost 1) (Regex.regex ("^.*?" ++ (Regex.escape host) ++ "(:\\d+)?")) (\_ -> "")
 
 
 parsePath : String -> List String
