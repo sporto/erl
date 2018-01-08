@@ -427,6 +427,10 @@ testToString =
               , { url1 | port_ = 80 }
               , "http://www.foo.com/users/1?q=1&k=2#a/b"
               )
+            , ( "it doesn't include the port when it is 443 and the protocol is https"
+              , { url1 | protocol = "https", port_ = 443 }
+              , "https://www.foo.com/users/1?q=1&k=2#a/b"
+              )
             , ( "it doesn't add # when hash is empty"
               , { url1 | hash = "" }
               , "http://www.foo.com:2000/users/1?q=1&k=2"
