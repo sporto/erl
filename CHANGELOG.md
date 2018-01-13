@@ -2,6 +2,10 @@
 
 ## 13.0.1
 
+- Do not include port 443 (default) when protocol is https
+
+## 13.0.1
+
 - Fix parsing bugs see https://github.com/sporto/erl/pull/20
 
 ## 13.0.0
