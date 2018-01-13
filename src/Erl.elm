@@ -238,7 +238,8 @@ extractHost str =
     -- if str starts with // or contains :// then we can assume that what follows is the host
     -- if it doesn't then look for tld
     let
-        delim = schemeHostDelim str
+        delim =
+            schemeHostDelim str
     in
         case delim of
             Just delim ->
@@ -506,6 +507,12 @@ portComponent url =
 
         80 ->
             ""
+
+        443 ->
+            if url.protocol == "https" then
+                ""
+            else
+                ":443"
 
         _ ->
             ":" ++ (Basics.toString url.port_)
