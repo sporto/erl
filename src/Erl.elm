@@ -69,6 +69,8 @@ import Dict
 import Erl.Query
 import Erl.Types as Types
 import Http
+import Parser exposing (..)
+import Char
 import Regex
 import String exposing (..)
 
@@ -724,3 +726,40 @@ toAbsoluteString url =
             hashToString url
     in
         path_ ++ trailingSlash_ ++ query_ ++ hash
+
+
+
+-- NEW
+
+
+protocolParser : Parser String
+protocolParser =
+    map2
+        (\prot _ -> prot)
+        (keep oneOrMore Char.isLower)
+        (keyword "://")
+
+
+portParser : Parser Int
+portParser =
+    succeed identity |. keyword ":" |= int
+
+
+pathParser : Parser String
+pathParser =
+    keep oneOrMore (\c -> c /= '#' && c /= '?')
+
+
+queryParser : Parser String
+queryParser =
+    succeed identity
+        |. keyword "?"
+        |= (keep oneOrMore (\c -> c /= '#'))
+
+
+hashParser : Parser String
+hashParser =
+    succeed identity
+        |. keyword "#"
+        |= (keep oneOrMore (always True))
+        |. end
