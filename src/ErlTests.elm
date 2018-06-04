@@ -722,6 +722,77 @@ testPathEdgeCase =
 -- describe : String -> List Test -> Test
 
 
+parseTest testCase input expected =
+    test testCase <|
+        \_ ->
+            Expect.equal (Erl.parse2 input) expected
+
+
+parseTests =
+    describe "parse"
+        [ parseTest
+            "it works"
+            "http://hello.com:3000"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Just 3000
+                , pathname = ""
+                , search = ""
+                , hash = ""
+                }
+            )
+        , parseTest
+            "it may not have a port"
+            "http://hello.com"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Nothing
+                , pathname = ""
+                , search = ""
+                , hash = ""
+                }
+            )
+        , parseTest
+            "it can have a path"
+            "http://hello.com/a/b/c"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Nothing
+                , pathname = "/a/b/c"
+                , search = ""
+                , hash = ""
+                }
+            )
+        , parseTest
+            "it can have a query"
+            "http://hello.com/a?a=1&b=2"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Nothing
+                , pathname = "/a"
+                , search = "a=1&b=2"
+                , hash = ""
+                }
+            )
+        , parseTest
+            "it can have a hash"
+            "http://hello.com/a?a=1#x=1"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Nothing
+                , pathname = "/a"
+                , search = "a=1"
+                , hash = "x=1"
+                }
+            )
+        ]
+
+
 all : Test
 all =
     describe "Erl Tests"
@@ -751,4 +822,7 @@ all =
         , testSetQuery
         , testToString
         , testToAbsoluteString
+
+        -- new
+        , parseTests
         ]

@@ -19,6 +19,8 @@ module Erl
         , toString
         , toAbsoluteString
         , Url
+          -- new
+        , parse2
         )
 
 {-| Library for parsing and constructing URLs
@@ -734,7 +736,11 @@ toAbsoluteString url =
 
 type alias Url2 =
     { protocol : String
-    , port_ : Int
+    , host : String
+    , port_ : Maybe Int
+    , pathname : String
+    , search : String
+    , hash : String
     }
 
 
@@ -746,33 +752,55 @@ protocolParser =
         (keyword "://")
 
 
-portParser : Parser Int
+hostParser : Parser String
+hostParser =
+    keep oneOrMore (\c -> c /= ':' && c /= '/')
+
+
+portParser : Parser (Maybe Int)
 portParser =
-    succeed identity |. keyword ":" |= int
+    oneOf
+        [ Parser.map Just <| succeed identity |. keyword ":" |= int
+        , succeed Nothing
+        ]
 
 
-pathParser : Parser String
-pathParser =
-    keep oneOrMore (\c -> c /= '#' && c /= '?')
+pathnameParser : Parser String
+pathnameParser =
+    keep zeroOrMore (\c -> c /= '#' && c /= '?')
 
 
 queryParser : Parser String
 queryParser =
-    succeed identity
-        |. keyword "?"
-        |= (keep oneOrMore (\c -> c /= '#'))
+    oneOf
+        [ succeed identity
+            |. keyword "?"
+            |= (keep zeroOrMore (\c -> c /= '#'))
+        , succeed ""
+        ]
 
 
 hashParser : Parser String
 hashParser =
-    succeed identity
-        |. keyword "#"
-        |= (keep oneOrMore (always True))
-        |. end
+    oneOf
+        [ succeed identity
+            |. keyword "#"
+            |= (keep oneOrMore (always True))
+            |. end
+        , succeed ""
+        ]
 
 
 parser : Parser Url2
 parser =
     succeed Url2
         |= protocolParser
+        |= hostParser
         |= portParser
+        |= pathnameParser
+        |= queryParser
+        |= hashParser
+
+
+parse2 input =
+    run parser input
