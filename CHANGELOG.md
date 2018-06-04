@@ -1,5 +1,12 @@
 # Changelog
 
+## 14.0.0
+
+This version uses `elm-tools/parser`.
+
+- `parse` now returns a `Result`
+- `Url` is now a simpler record. Path and query are just strings. You can parse the query with other libraries e.g. `QS`.
+
 ## 13.0.1
 
 - Do not include port 443 (default) when protocol is https
