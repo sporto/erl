@@ -732,6 +732,12 @@ toAbsoluteString url =
 -- NEW
 
 
+type alias Url2 =
+    { protocol : String
+    , port_ : Int
+    }
+
+
 protocolParser : Parser String
 protocolParser =
     map2
@@ -763,3 +769,10 @@ hashParser =
         |. keyword "#"
         |= (keep oneOrMore (always True))
         |. end
+
+
+parser : Parser Url2
+parser =
+    succeed Url2
+        |= protocolParser
+        |= portParser
