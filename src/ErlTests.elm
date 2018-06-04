@@ -8,40 +8,6 @@ import Expect
 
 
 -- PROTOCOL
-
-
-testProtocol =
-    let
-        inputs =
-            [ ( "http://example.com:3000", "http" )
-            , ( "http://localhost:7000", "http" )
-            ]
-
-        run ( input, expected ) =
-            test ("Protocol" ++ input) <|
-                \() -> Expect.equal expected (Erl.parse input).protocol
-    in
-        describe "Protocol"
-            (List.map run inputs)
-
-
-testProtocolExtract =
-    let
-        inputs =
-            [ ( "http://example.com:3000", "http" )
-            , ( "https://example.com:3000", "https" )
-            , ( "example.com:3000", "" )
-            ]
-
-        run ( input, expected ) =
-            test ("Protocol" ++ input) <|
-                \() -> Expect.equal expected (Erl.extractProtocol input)
-    in
-        describe "Extract protocol"
-            (List.map run inputs)
-
-
-
 -- USERNAME
 -- PASSWORD
 -- HOST
@@ -146,71 +112,8 @@ testPortExtract =
             (List.map run inputs)
 
 
-testPort : Test
-testPort =
-    let
-        inputs =
-            [ ( "http://example.com:3000/users", 3000 )
-            , ( "http://example.com/users", 80 )
-            ]
-
-        run ( input, expected ) =
-            test ("Extracts the port " ++ input) <|
-                \() -> Expect.equal expected (Erl.parse input).port_
-    in
-        describe "Port"
-            (List.map run inputs)
-
-
 
 -- PATH
-
-
-testPathExtract : Test
-testPathExtract =
-    let
-        inputs =
-            [ ( "http://foo.com/users/index.html", "/users/index.html" )
-            , ( "http://foo.com/users//index.html", "/users//index.html" )
-            , ( "//foo.com/users/index.html", "/users/index.html" )
-            , ( "http://localhost/users/index.html", "/users/index.html" )
-            , ( "//localhost/localhost/users/index.html", "/localhost/users/index.html" )
-            , ( "//localhost/localhost/users//index.html", "/localhost/users//index.html" )
-            , ( "foo.com/users//index.html", "/users//index.html" )
-            , ( "/users/index.html", "/users/index.html" )
-            , ( "users/index.html", "users/index.html" )
-            , ( "users/index.html#xyz", "users/index.html" )
-            , ( "users/index.html?a=1", "users/index.html" )
-            , ( "http://example.com:2000", "" )
-            , ( "http://[^a](a+)+$/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab", "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab" )
-            , ( "file:///foo/bar", "/foo/bar" )
-            ]
-
-        run ( input, expected ) =
-            test ("Extracts path " ++ input) <|
-                \() -> Expect.equal expected (Erl.extractPath input)
-    in
-        describe "Extract path"
-            (List.map run inputs)
-
-
-testPath : Test
-testPath =
-    let
-        inputs =
-            [ ( "http://foo.com/users/index.html?a=1", [ "users", "index.html" ] )
-            , ( "/users/1/edit", [ "users", "1", "edit" ] )
-            , ( "//localhost/users/1/edit", [ "users", "1", "edit" ] )
-            , -- it decodes
-              ( "/us%2Fers/1/edit", [ "us/ers", "1", "edit" ] )
-            ]
-
-        run ( input, expected ) =
-            test ("Parses the path " ++ input) <|
-                \() -> Expect.equal expected (Erl.parse input).path
-    in
-        describe "Path"
-            (List.map run inputs)
 
 
 testHasLeadingSlash : Test
@@ -683,45 +586,6 @@ testQueryClear =
             \() -> Expect.equal expected actual
 
 
-testGetQueryValuesForKey =
-    let
-        url =
-            Erl.parse "?a=1&b=2&a=3"
-
-        input =
-            [ ( "a", [ "1", "3" ] )
-            , ( "c", [] )
-            ]
-
-        run ( key, expected ) =
-            let
-                actual =
-                    Erl.getQueryValuesForKey key url
-            in
-                test ("getQueryValuesForKey " ++ key) <|
-                    \() -> Expect.equal expected actual
-    in
-        describe "Gets query values" <| List.map run input
-
-
-testPathEdgeCase =
-    let
-        expected =
-            "http://some.domain/content"
-
-        actual =
-            Erl.parse "http://some.domain"
-                |> Erl.appendPathSegments [ "content" ]
-                |> Erl.toString
-    in
-        test "Single append with host" <|
-            \() -> Expect.equal expected actual
-
-
-
--- describe : String -> List Test -> Test
-
-
 parseTest testCase input expected =
     test testCase <|
         \_ ->
@@ -742,6 +606,46 @@ parseTests =
                 , hash = ""
                 }
             )
+
+        -- protocol
+        , parseTest
+            "it may have a protocol"
+            "https://hello.com"
+            (Ok
+                { protocol = "https"
+                , host = "hello.com"
+                , port_ = Nothing
+                , pathname = ""
+                , search = ""
+                , hash = ""
+                }
+            )
+
+        -- port
+        , parseTest
+            "it can have a port"
+            "http://hello.com:3000"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Just 3000
+                , pathname = ""
+                , search = ""
+                , hash = ""
+                }
+            )
+        , parseTest
+            "it can have a port before the path"
+            "http://hello.com:3000/a"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Just 3000
+                , pathname = "/a"
+                , search = ""
+                , hash = ""
+                }
+            )
         , parseTest
             "it may not have a port"
             "http://hello.com"
@@ -754,8 +658,10 @@ parseTests =
                 , hash = ""
                 }
             )
+
+        -- Path
         , parseTest
-            "it can have a path"
+            "it can have a pathname"
             "http://hello.com/a/b/c"
             (Ok
                 { protocol = "http"
@@ -766,6 +672,32 @@ parseTests =
                 , hash = ""
                 }
             )
+        , parseTest
+            "it can have a pathname with extension"
+            "http://hello.com/a/b/c.html"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Nothing
+                , pathname = "/a/b/c.html"
+                , search = ""
+                , hash = ""
+                }
+            )
+        , parseTest
+            "it can get the file pathname"
+            "file:///foo/bar"
+            (Ok
+                { protocol = "file"
+                , host = ""
+                , port_ = Nothing
+                , pathname = "/foo/bar"
+                , search = ""
+                , hash = ""
+                }
+            )
+
+        -- Query
         , parseTest
             "it can have a query"
             "http://hello.com/a?a=1&b=2"
@@ -778,6 +710,8 @@ parseTests =
                 , hash = ""
                 }
             )
+
+        -- Hash
         , parseTest
             "it can have a hash"
             "http://hello.com/a?a=1#x=1"
@@ -790,6 +724,18 @@ parseTests =
                 , hash = "x=1"
                 }
             )
+        , parseTest
+            "it can have a hash without query"
+            "http://hello.com/a#x=1"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Nothing
+                , pathname = "/a"
+                , search = ""
+                , hash = "x=1"
+                }
+            )
         ]
 
 
@@ -798,7 +744,6 @@ all =
     describe "Erl Tests"
         [ testAddQuery
         , testAppendPathSegments
-        , testGetQueryValuesForKey
         , testHash
         , testHashExtract
         , testHasLeadingSlash
@@ -806,13 +751,7 @@ all =
         , testHost
         , testHostExtract
         , testNew
-        , testPath
-        , testPathEdgeCase
-        , testPathExtract
-        , testPort
         , testPortExtract
-        , testProtocol
-        , testProtocolExtract
         , testQueryParsing
         , testQueryClear
         , testQueryExtract

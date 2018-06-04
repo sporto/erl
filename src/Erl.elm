@@ -754,7 +754,10 @@ protocolParser =
 
 hostParser : Parser String
 hostParser =
-    keep oneOrMore (\c -> c /= ':' && c /= '/')
+    oneOf
+        [ keep oneOrMore (\c -> c /= ':' && c /= '/')
+        , succeed ""
+        ]
 
 
 portParser : Parser (Maybe Int)
