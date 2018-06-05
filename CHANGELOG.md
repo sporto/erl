@@ -4,8 +4,19 @@
 
 This version uses `elm-tools/parser`.
 
+### Changed
+
 - `parse` now returns a `Result`
-- `Url` is now a simpler record. Path and query are just strings. You can parse the query with other libraries e.g. `QS`.
+- `Url` is now a simpler record. `pathname` and `query` are just strings.
+
+### Removed
+
+- Path as `List String`
+- Path operations
+- Query as Dict
+- Query operations
+- Implicit ports based on the protocol
+- Decoding when parsing
 
 ## 13.0.1
 
