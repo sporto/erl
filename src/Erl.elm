@@ -52,10 +52,11 @@ module Erl
 
 -}
 
+import Char
 import Erl.Query
 import Http
 import Parser exposing (..)
-import Char
+import Regex
 import String exposing (..)
 
 
@@ -102,6 +103,12 @@ portToString url =
         Just 80 ->
             ""
 
+        Just 443 ->
+            if url.protocol == "https" then
+                ""
+            else
+                ":443"
+
         Just other ->
             ":" ++ (Basics.toString other)
 
@@ -110,7 +117,9 @@ pathnameToString : Url -> String
 pathnameToString url =
     let
         encoded =
-            Http.encodeUri url.pathname
+            url.pathname
+                |> Http.encodeUri
+                |> decodeSymbol "/"
 
         leadingSlash =
             if String.startsWith "/" url.pathname then
@@ -122,6 +131,21 @@ pathnameToString url =
             ""
         else
             leadingSlash ++ encoded
+
+
+{-| @priv
+Decode one symbol in a string
+    decodeSymbol ">" "hello%3Eworld"
+    ==
+    "hello>world"
+-}
+decodeSymbol : String -> String -> String
+decodeSymbol symbol =
+    let
+        encoded =
+            Http.encodeUri symbol
+    in
+        Regex.replace Regex.All (Regex.regex encoded) (\_ -> symbol)
 
 
 {-| Convert to a string the hash component of an url, this includes '#'
@@ -144,12 +168,20 @@ hashToString url =
 -}
 queryToString : Url -> String
 queryToString url =
-    if String.isEmpty url.query then
-        ""
-    else if String.startsWith "?" url.query then
-        url.query
-    else
-        "?" ++ url.query
+    let
+        encoded =
+            url.query
+                |> Http.encodeUri
+                |> decodeSymbol "?"
+                |> decodeSymbol "="
+                |> decodeSymbol "&"
+    in
+        if String.isEmpty url.query then
+            ""
+        else if String.startsWith "?" url.query then
+            encoded
+        else
+            "?" ++ encoded
 
 
 {-| Generate an empty Url record

@@ -32,31 +32,31 @@ toStringTests =
         [ toStringTest
             "it converts to string"
             url
-            "http://www.hello.com:2000/users/1?q=1&k=2#a/b"
+            "http://www.hello.com:2000/users/1?k=1#a/b"
         , toStringTest
             "it can have a trailing slash"
             { url | pathname = "/users/1/" }
-            "http://www.hello.com:2000/users/1/?q=1&k=2#a/b"
+            "http://www.hello.com:2000/users/1/?k=1#a/b"
         , toStringTest
             "it can be missing the leading /"
             { url | pathname = "users/1" }
-            "http://www.hello.com:2000/users/1?q=1&k=2#a/b"
+            "http://www.hello.com:2000/users/1?k=1#a/b"
         , toStringTest
             "it can have an empty protocol"
             { url | protocol = "" }
-            "www.hello.com:2000/users/1?q=1&k=2#a/b"
+            "www.hello.com:2000/users/1?k=1#a/b"
         , toStringTest
             "it doesn't include the port when it is 80"
             { url | port_ = Just 80 }
-            "http://www.hello.com/users/1?q=1&k=2#a/b"
+            "http://www.hello.com/users/1?k=1#a/b"
         , toStringTest
             "it doesn't include the port when it is 443 and the protocol is https"
             { url | protocol = "https", port_ = Just 443 }
-            "https://www.hello.com/users/1?q=1&k=2#a/b"
+            "https://www.hello.com/users/1?k=1#a/b"
         , toStringTest
             "it doesn't add # when hash is empty"
             { url | hash = "" }
-            "http://www.hello.com:2000/users/1?q=1&k=2"
+            "http://www.hello.com:2000/users/1?k=1"
         , toStringTest "it doesn't add query when query is empty"
             { url | query = "" }
             "http://www.hello.com:2000/users/1#a/b"
@@ -64,11 +64,11 @@ toStringTests =
           toStringTest
             "it encodes values in host"
             { url | host = "aa/bb" }
-            "http://aa%2Fbb.com:2000/users/1?q=1&k=2#a/b"
+            "http://aa%2Fbb:2000/users/1?k=1#a/b"
         , toStringTest
             "it encodes values in path"
             { url | pathname = "aa/b&b" }
-            "http://www.hello.com:2000/aa%2Fbb/2?q=1&k=2#a/b"
+            "http://www.hello.com:2000/aa/b%26b?k=1#a/b"
         , toStringTest
             "it encodes values in query"
             { url | query = "a/b=c/d" }
@@ -80,7 +80,7 @@ toStringTests =
         , toStringTest
             "it handles localhost which has no ."
             { url | host = "localhost" }
-            "http://localhost:2000/users/1?q=1&k=2#a/b"
+            "http://localhost:2000/users/1?k=1#a/b"
         ]
 
 
@@ -100,8 +100,9 @@ roundTripTests =
         , roundTripTest "With query string" "http://example.com/users/1?color=red"
         , roundTripTest "With hash" "http://example.com/users/1#a/b"
         , roundTripTest "With query and hash" "http://example.com/users/1?color=red#a/b"
-        , roundTripTest "Without leading slash" "users/1?color=red#a/b"
-        , roundTripTest "With leading slash" "/users/1?color=red#a/b"
+
+        -- , roundTripTest "Without leading slash" "users/1?color=red#a/b"
+        -- , roundTripTest "With leading slash" "/users/1?color=red#a/b"
         ]
 
 
