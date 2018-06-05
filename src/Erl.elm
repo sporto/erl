@@ -15,40 +15,21 @@ module Erl
 
 @docs Url
 
-
 # Parse
 
 @docs parse
-
-
-# Parse helpers
-
-@docs extractHash, extractHost, extractPath, extractProtocol, extractPort, extractQuery
-
 
 # Construct
 
 @docs new
 
-
-# Mutation helpers
-
-@docs addQuery, setQuery, removeQuery, clearQuery, appendPathSegments
-
-
 # Serialize
 
 @docs toString, toAbsoluteString
 
-
 # Serialization helpers
 
 @docs queryToString
-
-
-# Other helpers
-
-@docs getQueryValuesForKey
 
 -}
 
@@ -314,5 +295,19 @@ parser =
         |= hashParser
 
 
+{-| Parse an url into a Url record
+
+    Erl.parse "http://hello.com/users/1?k=1&q=2#a/b"
+
+    Ok
+        { protocol = "http",
+        , host = "hello.com",
+        , pathname = "/users/1",
+        , port_ = 2000,
+        , hash = "a/b",
+        , query = "k=1&q=2"
+        }
+
+-}
 parse input =
     run parser input
