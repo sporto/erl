@@ -171,8 +171,8 @@ queryToString url =
 
     { protocol = ""
     , host = ""
-    , pathname = ""
     , port_ = Nothing
+    , pathname = ""
     , hash = ""
     , query = ""
     }
@@ -193,8 +193,8 @@ new =
 
     url = { protocol = "http",
           , host = "www.hello.com",
-          , pathname = "/users/1",
           , port_ = 2000,
+          , pathname = "/users/1",
           , hash = "a/b",
           , query = "k=1&q=2"
           }
@@ -214,8 +214,8 @@ toString url =
 
     url = { protocol = "http",
           , host = "www.hello.com",
-          , pathname = "/users/1",
           , port_ = 2000,
+          , pathname = "/users/1",
           , hash = "a/b",
           , query = "k=1&q=2"
           }
@@ -302,8 +302,8 @@ parser =
     Ok
         { protocol = "http",
         , host = "hello.com",
-        , pathname = "/users/1",
         , port_ = 2000,
+        , pathname = "/users/1",
         , hash = "a/b",
         , query = "k=1&q=2"
         }

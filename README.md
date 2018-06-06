@@ -14,34 +14,16 @@ Erl.parse url
 
 -- Returns a Erl.Url record:
 
-{ protocol: "http"
-, username: "sam"
-, password: "pass"
-, host: ["api", "example", "com"]
-, port_: 3000
-, path: ["products", "kids"]
-, hash: "toys/1"
-, hasLeadingSlash: True
-, hasTrailingSlash: False
-, query: 
-    [ ("color", "red")
-    , ("age", "10")
-    ]
+{ protocol = "http"
+, host = "api.example.com"
+, port_ = 3000
+, pathname = "/products/kids"
+, hash = "toys/1"
+, query = "color=red&age=10"
 }
 ```
 
 See MDN for more details (https://developer.mozilla.org/en-US/docs/Web/API/Location). Note that in MDN `query` is called `search`.
-
-## Construct
-
-### `new`
-
-```elm
--- Construct an empty Erl.Url record:
-
-url = 
-  Erl.new
-```
 
 ## `toString`
 
@@ -55,10 +37,6 @@ Erl.toString url
 "http://www.foo.com:2000/users/1?k=2&q=1#a/b"
 ```
 
-## Mutations
-
-See documentation
-
 ## Documentation
 
 [Documentation at package.elm-lang.org](http://package.elm-lang.org/packages/sporto/erl/latest/Erl)
@@ -69,10 +47,5 @@ See documentation
 yarn install
 npm test
 ```
-
-## Todo
-
-- Username
-- Password
 
 ## [Changelog](https://github.com/sporto/erl/blob/master/changelog.md)

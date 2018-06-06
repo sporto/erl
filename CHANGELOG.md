@@ -2,7 +2,7 @@
 
 ## 14.0.0
 
-This version uses `elm-tools/parser`.
+This version is a major re-write. It now uses `elm-tools/parser`.
 
 ### Changed
 
@@ -17,6 +17,8 @@ This version uses `elm-tools/parser`.
 - Query operations
 - Implicit ports based on the protocol
 - Decoding when parsing
+
+This version removes many features the previous version had, please open issues if you consider these necessary.
 
 ## 13.0.1
 
