@@ -14,8 +14,8 @@ url : Erl.Url
 url =
     { protocol = "http"
     , host = "www.hello.com"
-    , pathname = "/users/1"
     , port_ = Just 2000
+    , pathname = "/users/1"
     , hash = "a/b"
     , query = "k=1"
     }
@@ -100,9 +100,6 @@ roundTripTests =
         , roundTripTest "With query string" "http://example.com/users/1?color=red"
         , roundTripTest "With hash" "http://example.com/users/1#a/b"
         , roundTripTest "With query and hash" "http://example.com/users/1?color=red#a/b"
-
-        -- , roundTripTest "Without leading slash" "users/1?color=red#a/b"
-        -- , roundTripTest "With leading slash" "/users/1?color=red#a/b"
         ]
 
 
@@ -262,6 +259,18 @@ parseTests =
             (Ok
                 { protocol = "http"
                 , host = "hello.com"
+                , port_ = Nothing
+                , pathname = "/a"
+                , query = ""
+                , hash = "x=1"
+                }
+            )
+        , parseTest
+            "it can have a missing host"
+            "/a#x=1"
+            (Ok
+                { protocol = ""
+                , host = ""
                 , port_ = Nothing
                 , pathname = "/a"
                 , query = ""

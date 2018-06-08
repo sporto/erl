@@ -236,10 +236,13 @@ toAbsoluteString url =
 
 protocolParser : Parser String
 protocolParser =
-    map2
-        (\prot _ -> prot)
-        (keep oneOrMore Char.isLower)
-        (keyword "://")
+    oneOf
+        [ map2
+            (\prot _ -> prot)
+            (keep oneOrMore Char.isLower)
+            (keyword "://")
+        , succeed ""
+        ]
 
 
 hostParser : Parser String
