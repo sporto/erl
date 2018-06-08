@@ -2,7 +2,7 @@
 
 ## 14.0.0
 
-This version is a major re-write. It now uses `elm-tools/parser`.
+This version is a major re-write, it now uses `elm-tools/parser`.
 
 ### Changed
 
@@ -13,12 +13,12 @@ This version is a major re-write. It now uses `elm-tools/parser`.
 
 - Path as `List String`
 - Path operations
-- Query as Dict
+- Query as `Dict`
 - Query operations
 - Implicit ports based on the protocol
 - Decoding when parsing
 
-This version removes many features the previous version had, please open issues if you consider these necessary.
+This version removes many features that the previous version had, please open issues if you consider any missing feature necessary.
 
 ## 13.0.1
 

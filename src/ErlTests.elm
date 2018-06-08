@@ -235,7 +235,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = "/a"
-                , query = "a=1&b=2"
+                , query = "?a=1&b=2"
                 , hash = ""
                 }
             )
@@ -249,8 +249,8 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = "/a"
-                , query = "a=1"
-                , hash = "x=1"
+                , query = "?a=1"
+                , hash = "#x=1"
                 }
             )
         , parseTest
@@ -262,7 +262,7 @@ parseTests =
                 , port_ = Nothing
                 , pathname = "/a"
                 , query = ""
-                , hash = "x=1"
+                , hash = "#x=1"
                 }
             )
         , parseTest
@@ -274,7 +274,7 @@ parseTests =
                 , port_ = Nothing
                 , pathname = "/a"
                 , query = ""
-                , hash = "x=1"
+                , hash = "#x=1"
                 }
             )
         ]

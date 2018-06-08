@@ -138,6 +138,8 @@ hashToString : Url -> String
 hashToString url =
     if String.isEmpty url.hash then
         ""
+    else if String.startsWith "#" url.hash then
+        url.hash
     else
         "#" ++ url.hash
 
@@ -195,8 +197,8 @@ new =
           , host = "www.hello.com",
           , port_ = 2000,
           , pathname = "/users/1",
-          , hash = "a/b",
-          , query = "k=1&q=2"
+          , hash = "#a/b",
+          , query = "?k=1&q=2"
           }
 
     Erl.toString url == "http://www.hello.com:2000/users/1?k=1&q=2#a/b"
@@ -216,8 +218,8 @@ toString url =
           , host = "www.hello.com",
           , port_ = 2000,
           , pathname = "/users/1",
-          , hash = "a/b",
-          , query = "k=1&q=2"
+          , hash = "#a/b",
+          , query = "?k=1&q=2"
           }
 
     Erl.toAbsoluteString url == "/users/1?k=1&q=2#a/b"
@@ -269,8 +271,8 @@ pathnameParser =
 queryParser : Parser String
 queryParser =
     oneOf
-        [ succeed identity
-            |. keyword "?"
+        [ succeed (++)
+            |= (keep (Exactly 1) (\c -> c == '?'))
             |= (keep zeroOrMore (\c -> c /= '#'))
         , succeed ""
         ]
@@ -279,8 +281,8 @@ queryParser =
 hashParser : Parser String
 hashParser =
     oneOf
-        [ succeed identity
-            |. keyword "#"
+        [ succeed (++)
+            |= (keep (Exactly 1) (\c -> c == '#'))
             |= (keep oneOrMore (always True))
             |. end
         , succeed ""
