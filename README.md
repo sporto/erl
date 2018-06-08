@@ -37,6 +37,12 @@ Erl.toString url
 "http://www.foo.com:2000/users/1?k=2&q=1#a/b"
 ```
 
+## Query parsing
+
+There isn't a unique standard for query parsing. Many frameworks / libraries do this in different ways. E.g. an array might be `a[]=1&a[]=2` or `a=1&a=2`.
+
+This version of Erl doesn't have an opinionated way of parsing the query anymore. Instead you will get the raw string e.g. `?a=1&b=2`. There are other good Elm libraries to parse queries.
+
 ## Documentation
 
 [Documentation at package.elm-lang.org](http://package.elm-lang.org/packages/sporto/erl/latest/Erl)
