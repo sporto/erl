@@ -16,7 +16,7 @@ Erl.parse url
 
 { protocol = "http"
 , host = "api.example.com"
-, port_ = 3000
+, port_ = Just 3000
 , pathname = "/products/kids"
 , hash = "#toys/1"
 , query = "?color=red&age=10"

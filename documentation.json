@@ -1,0 +1,43 @@
+[
+  {
+    "name": "Erl",
+    "comment": " Library for parsing and constructing URLs\n\n\n# Types\n\n@docs Url\n\n# Parse\n\n@docs parse\n\n# Construct\n\n@docs new\n\n# Serialize\n\n@docs toString, toAbsoluteString\n\n# Serialization helpers\n\n@docs queryToString\n\n",
+    "aliases": [
+      {
+        "name": "Url",
+        "comment": " Record that holds url attributes\n",
+        "args": [],
+        "type": "{ protocol : String , host : String , port_ : Maybe.Maybe Int , pathname : String , query : String , hash : String }"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "new",
+        "comment": " Generate an empty Url record\n\n    Erl.new ==\n\n    { protocol = \"\"\n    , host = \"\"\n    , port_ = Nothing\n    , pathname = \"\"\n    , hash = \"\"\n    , query = \"\"\n    }\n\n",
+        "type": "Erl.Url"
+      },
+      {
+        "name": "parse",
+        "comment": " Parse an url into a Url record\n\n    Erl.parse \"http://hello.com/users/1?k=1&q=2#a/b\"\n\n    Ok\n        { protocol = \"http\",\n        , host = \"hello.com\",\n        , port_ = 2000,\n        , pathname = \"/users/1\",\n        , hash = \"a/b\",\n        , query = \"k=1&q=2\"\n        }\n\n",
+        "type": "String -> Result.Result Parser.Error Erl.Url"
+      },
+      {
+        "name": "queryToString",
+        "comment": " Convert to a string the query component of an url, this includes '?'\n\n    queryToString url == \"?k=1\"\n\n",
+        "type": "Erl.Url -> String"
+      },
+      {
+        "name": "toAbsoluteString",
+        "comment": " Generate a url that starts at the path\n\n    url = { protocol = \"http\",\n          , host = \"www.hello.com\",\n          , port_ = 2000,\n          , pathname = \"/users/1\",\n          , hash = \"#a/b\",\n          , query = \"?k=1&q=2\"\n          }\n\n    Erl.toAbsoluteString url == \"/users/1?k=1&q=2#a/b\"\n\n",
+        "type": "Erl.Url -> String"
+      },
+      {
+        "name": "toString",
+        "comment": " Generate a url string from an Url record\n\n    url = { protocol = \"http\",\n          , host = \"www.hello.com\",\n          , port_ = 2000,\n          , pathname = \"/users/1\",\n          , hash = \"#a/b\",\n          , query = \"?k=1&q=2\"\n          }\n\n    Erl.toString url == \"http://www.hello.com:2000/users/1?k=1&q=2#a/b\"\n\n",
+        "type": "Erl.Url -> String"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  }
+]

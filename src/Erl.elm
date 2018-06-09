@@ -2,10 +2,10 @@ module Erl
     exposing
         ( new
         , parse
-        , queryToString
         , toString
         , toAbsoluteString
         , Url
+        , Query
         )
 
 {-| Library for parsing and constructing URLs
@@ -13,7 +13,7 @@ module Erl
 
 # Types
 
-@docs Url
+@docs Url, Query
 
 # Parse
 
@@ -27,14 +27,9 @@ module Erl
 
 @docs toString, toAbsoluteString
 
-# Serialization helpers
-
-@docs queryToString
-
 -}
 
 import Char
-import Erl.Query
 import Http
 import Parser exposing (..)
 import Regex
@@ -54,6 +49,10 @@ type alias Url =
     , query : String
     , hash : String
     }
+
+
+type alias Query =
+    List ( String, String )
 
 
 
@@ -195,7 +194,7 @@ new =
 
     url = { protocol = "http",
           , host = "www.hello.com",
-          , port_ = 2000,
+          , port_ = Just 2000,
           , pathname = "/users/1",
           , hash = "#a/b",
           , query = "?k=1&q=2"
@@ -216,7 +215,7 @@ toString url =
 
     url = { protocol = "http",
           , host = "www.hello.com",
-          , port_ = 2000,
+          , port_ = Just 2000,
           , pathname = "/users/1",
           , hash = "#a/b",
           , query = "?k=1&q=2"
@@ -307,12 +306,13 @@ parser =
     Ok
         { protocol = "http",
         , host = "hello.com",
-        , port_ = 2000,
+        , port_ = Just 2000,
         , pathname = "/users/1",
         , hash = "a/b",
         , query = "k=1&q=2"
         }
 
 -}
+parse : String -> Result Parser.Error Url
 parse input =
     run parser input
