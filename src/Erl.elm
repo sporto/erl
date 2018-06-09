@@ -51,6 +51,8 @@ type alias Url =
     }
 
 
+{-| List holding query string values
+-}
 type alias Query =
     List ( String, String )
 
@@ -196,7 +198,7 @@ new =
           , host = "www.hello.com",
           , port_ = Just 2000,
           , pathname = "/users/1",
-          , hash = "#a/b",
+          , hash = "a/b",
           , query = "?k=1&q=2"
           }
 
@@ -217,7 +219,7 @@ toString url =
           , host = "www.hello.com",
           , port_ = Just 2000,
           , pathname = "/users/1",
-          , hash = "#a/b",
+          , hash = "a/b",
           , query = "?k=1&q=2"
           }
 
@@ -280,8 +282,8 @@ queryParser =
 hashParser : Parser String
 hashParser =
     oneOf
-        [ succeed (++)
-            |= (keep (Exactly 1) (\c -> c == '#'))
+        [ succeed identity
+            |. keyword "#"
             |= (keep oneOrMore (always True))
             |. end
         , succeed ""

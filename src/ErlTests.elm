@@ -250,7 +250,7 @@ parseTests =
                 , port_ = Nothing
                 , pathname = "/a"
                 , query = "?a=1"
-                , hash = "#x=1"
+                , hash = "x=1"
                 }
             )
         , parseTest
@@ -262,7 +262,7 @@ parseTests =
                 , port_ = Nothing
                 , pathname = "/a"
                 , query = ""
-                , hash = "#x=1"
+                , hash = "x=1"
                 }
             )
         , parseTest
@@ -274,7 +274,7 @@ parseTests =
                 , port_ = Nothing
                 , pathname = "/a"
                 , query = ""
-                , hash = "#x=1"
+                , hash = "x=1"
                 }
             )
         ]
