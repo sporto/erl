@@ -5,7 +5,6 @@ module Erl
         , toString
         , toAbsoluteString
         , Url
-        , Query
         )
 
 {-| Library for parsing and constructing URLs
@@ -13,7 +12,7 @@ module Erl
 
 # Types
 
-@docs Url, Query
+@docs Url
 
 # Parse
 
@@ -30,6 +29,7 @@ module Erl
 -}
 
 import Char
+import Erl.Query exposing (Query)
 import Http
 import Parser exposing (..)
 import Regex
@@ -49,12 +49,6 @@ type alias Url =
     , query : Query
     , hash : String
     }
-
-
-{-| List holding query string values
--}
-type alias Query =
-    List ( String, String )
 
 
 
@@ -265,28 +259,6 @@ pathnameParser =
     keep zeroOrMore (\c -> c /= '#' && c /= '?')
 
 
-queryParser : Parser Query
-queryParser =
-    oneOf
-        [ succeed identity
-            |. symbol "?"
-            |= repeat oneOrMore kvParser
-        , succeed []
-        ]
-
-
-kvParser : Parser ( String, String )
-kvParser =
-    succeed (,)
-        |= keep oneOrMore (\c -> c /= '=' && c /= '#')
-        |. symbol "="
-        |= keep oneOrMore (\c -> c /= '&' && c /= '#')
-        |. oneOf
-            [ symbol "&"
-            , succeed ()
-            ]
-
-
 hashParser : Parser String
 hashParser =
     oneOf
@@ -305,7 +277,7 @@ parser =
         |= hostParser
         |= portParser
         |= pathnameParser
-        |= queryParser
+        |= Erl.Query.parser
         |= hashParser
         |. end
 

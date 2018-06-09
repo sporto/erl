@@ -1,19 +1,24 @@
 module Erl.Query
     exposing
         ( parse
+        , parser
         , toString
         , add
         , set
         , remove
         , getValuesForKey
+        , Query
         )
 
 {-| Functions to work with a Query record
 
+# Types
+
+@docs Query
 
 # Parse
 
-@docs parse
+@docs parse, parser
 
 
 # Mutation helpers
@@ -32,9 +37,15 @@ module Erl.Query
 
 -}
 
-import Erl.Types as Types
 import Http
 import String
+import Parser exposing (..)
+
+
+{-| List holding query string values
+-}
+type alias Query =
+    List ( String, String )
 
 
 {-| Parse a query string
@@ -42,46 +53,49 @@ import String
     Erl.Query.parse "?a=1&b=2&a=3" == [("a", "1"), ("b", "2"), ("a", "1")]
 
 -}
-parse : String -> Types.Query
-parse queryString =
-    let
-        trimmed =
-            queryString
-                |> String.split "?"
-                |> String.join ""
-
-        splitted =
-            String.split "&" trimmed
-    in
-        if String.isEmpty trimmed then
-            []
-        else
-            List.map queryStringElementToTuple splitted
+parse : String -> Result Parser.Error Query
+parse input =
+    run parser input
 
 
+{-| Query Parser
 
--- "a=1" --> ("a", "1")
+-}
+parser : Parser Query
+parser =
+    oneOf
+        [ succeed identity
+            |. symbol "?"
+            |= repeat oneOrMore kvParser
+        , succeed []
+        ]
 
 
-queryStringElementToTuple : String -> ( String, String )
-queryStringElementToTuple element =
-    let
-        splitted =
-            String.split "=" element
+kvParser : Parser ( String, String )
+kvParser =
+    succeed (,)
+        |= map decodeUri keyParser
+        |. symbol "="
+        |= map decodeUri valueParser
+        |. oneOf
+            [ symbol "&"
+            , succeed ()
+            ]
 
-        first =
-            Maybe.withDefault "" (List.head splitted)
 
-        firstDecoded =
-            Http.decodeUri first |> Maybe.withDefault ""
+keyParser : Parser String
+keyParser =
+    keep oneOrMore (\c -> c /= '=' && c /= '#')
 
-        second =
-            Maybe.withDefault "" (List.head (List.drop 1 splitted))
 
-        secondDecoded =
-            Http.decodeUri second |> Maybe.withDefault ""
-    in
-        ( firstDecoded, secondDecoded )
+valueParser : Parser String
+valueParser =
+    keep oneOrMore (\c -> c /= '&' && c /= '#')
+
+
+decodeUri : String -> String
+decodeUri =
+    Http.decodeUri >> Maybe.withDefault ""
 
 
 {-| Convert to a string, this includes '?'
@@ -89,7 +103,7 @@ queryStringElementToTuple element =
     Erl.Query.toString query == "?a=1&b=2"
 
 -}
-toString : Types.Query -> String
+toString : Query -> String
 toString query =
     let
         encodedTuples =
@@ -111,7 +125,7 @@ toString query =
 This doesn't replace existing keys, so if this is a duplicated this key is just added.
 
 -}
-add : String -> String -> Types.Query -> Types.Query
+add : String -> String -> Query -> Query
 add key val =
     List.reverse
         >> (::) ( key, val )
@@ -123,7 +137,7 @@ add key val =
     Erl.Query.set key value query
 
 -}
-set : String -> String -> Types.Query -> Types.Query
+set : String -> String -> Query -> Query
 set key val query =
     let
         without =
@@ -137,7 +151,7 @@ set key val query =
     Erl.Query.remove key query
 
 -}
-remove : String -> Types.Query -> Types.Query
+remove : String -> Query -> Query
 remove key query =
     List.filter (\( k, v ) -> k /= key) query
 
@@ -151,7 +165,7 @@ remove key query =
     == ["1", "3"]
 
 -}
-getValuesForKey : String -> Types.Query -> List String
+getValuesForKey : String -> Query -> List String
 getValuesForKey key =
     List.filter (\( k, _ ) -> k == key)
         >> List.map Tuple.second

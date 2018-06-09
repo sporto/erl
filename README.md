@@ -18,8 +18,8 @@ Erl.parse url
 , host = "api.example.com"
 , port_ = Just 3000
 , pathname = "/products/kids"
+, query = [ ( "color", "red" ), ( "age", "10") ]
 , hash = "#toys/1"
-, query = "?color=red&age=10"
 }
 ```
 
@@ -41,7 +41,7 @@ Erl.toString url
 
 There isn't a unique standard for query parsing. Many frameworks / libraries do this in different ways. E.g. an array might be `a[]=1&a[]=2` or `a=1&a=2`.
 
-This version of Erl doesn't have an opinionated way of parsing the query anymore. Instead you will get the raw string e.g. `?a=1&b=2`. There are other good Elm libraries to parse queries.
+Erl parses the query into a `List (String, String)`. This is a bit more useful than just a string, but not as opinionated as other libraries.
 
 ## Documentation
 
