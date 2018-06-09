@@ -33,7 +33,7 @@ import Char
 import Http
 import Parser exposing (..)
 import Regex
-import String exposing (..)
+import String
 
 
 -- TYPES
@@ -46,7 +46,7 @@ type alias Url =
     , host : String
     , port_ : Maybe Int
     , pathname : String
-    , query : String
+    , query : Query
     , hash : String
     }
 
@@ -155,15 +155,11 @@ queryToString url =
     let
         encoded =
             url.query
-                |> Http.encodeUri
-                |> decodeSymbol "?"
-                |> decodeSymbol "="
-                |> decodeSymbol "&"
+                |> List.map (\( k, v ) -> Http.encodeUri k ++ "=" ++ Http.encodeUri v)
+                |> String.join "&"
     in
-        if String.isEmpty url.query then
+        if List.isEmpty url.query then
             ""
-        else if String.startsWith "?" url.query then
-            encoded
         else
             "?" ++ encoded
 
@@ -176,8 +172,8 @@ queryToString url =
     , host = ""
     , port_ = Nothing
     , pathname = ""
+    , query = []
     , hash = ""
-    , query = ""
     }
 
 -}
@@ -187,8 +183,8 @@ new =
     , host = ""
     , pathname = ""
     , port_ = Nothing
+    , query = []
     , hash = ""
-    , query = ""
     }
 
 
@@ -198,8 +194,8 @@ new =
           , host = "www.hello.com",
           , port_ = Just 2000,
           , pathname = "/users/1",
+          , query = [ ("k", "1"), ("q", "2") ]
           , hash = "a/b",
-          , query = "?k=1&q=2"
           }
 
     Erl.toString url == "http://www.hello.com:2000/users/1?k=1&q=2#a/b"
@@ -219,8 +215,8 @@ toString url =
           , host = "www.hello.com",
           , port_ = Just 2000,
           , pathname = "/users/1",
+          , query = [ ("k", "1"), ("q", "2") ]
           , hash = "a/b",
-          , query = "?k=1&q=2"
           }
 
     Erl.toAbsoluteString url == "/users/1?k=1&q=2#a/b"
@@ -259,7 +255,7 @@ hostParser =
 portParser : Parser (Maybe Int)
 portParser =
     oneOf
-        [ Parser.map Just <| succeed identity |. keyword ":" |= int
+        [ Parser.map Just <| succeed identity |. symbol ":" |= int
         , succeed Nothing
         ]
 
@@ -269,21 +265,33 @@ pathnameParser =
     keep zeroOrMore (\c -> c /= '#' && c /= '?')
 
 
-queryParser : Parser String
+queryParser : Parser Query
 queryParser =
     oneOf
-        [ succeed (++)
-            |= (keep (Exactly 1) (\c -> c == '?'))
-            |= (keep zeroOrMore (\c -> c /= '#'))
-        , succeed ""
+        [ succeed identity
+            |. symbol "?"
+            |= repeat oneOrMore kvParser
+        , succeed []
         ]
+
+
+kvParser : Parser ( String, String )
+kvParser =
+    succeed (,)
+        |= keep oneOrMore (\c -> c /= '=' && c /= '#')
+        |. symbol "="
+        |= keep oneOrMore (\c -> c /= '&' && c /= '#')
+        |. oneOf
+            [ symbol "&"
+            , succeed ()
+            ]
 
 
 hashParser : Parser String
 hashParser =
     oneOf
         [ succeed identity
-            |. keyword "#"
+            |. symbol "#"
             |= (keep oneOrMore (always True))
             |. end
         , succeed ""
@@ -299,6 +307,7 @@ parser =
         |= pathnameParser
         |= queryParser
         |= hashParser
+        |. end
 
 
 {-| Parse an url into a Url record
@@ -310,8 +319,8 @@ parser =
         , host = "hello.com",
         , port_ = Just 2000,
         , pathname = "/users/1",
+        , query = [ ("k", "1"), ("q", "2") ]
         , hash = "a/b",
-        , query = "k=1&q=2"
         }
 
 -}

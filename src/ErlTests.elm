@@ -16,8 +16,8 @@ url =
     , host = "www.hello.com"
     , port_ = Just 2000
     , pathname = "/users/1"
+    , query = [ ( "k", "1" ) ]
     , hash = "a/b"
-    , query = "k=1"
     }
 
 
@@ -58,7 +58,7 @@ toStringTests =
             { url | hash = "" }
             "http://www.hello.com:2000/users/1?k=1"
         , toStringTest "it doesn't add query when query is empty"
-            { url | query = "" }
+            { url | query = [] }
             "http://www.hello.com:2000/users/1#a/b"
         , --
           toStringTest
@@ -71,12 +71,8 @@ toStringTests =
             "http://www.hello.com:2000/aa/b%26b?k=1#a/b"
         , toStringTest
             "it encodes values in query"
-            { url | query = "a/b=c/d" }
+            { url | query = [ ( "a/b", "c/d" ) ] }
             "http://www.hello.com:2000/users/1?a%2Fb=c%2Fd#a/b"
-        , toStringTest
-            "query can have ?"
-            { url | query = "?a=1" }
-            "http://www.hello.com:2000/users/1?a=1#a/b"
         , toStringTest
             "it handles localhost which has no ."
             { url | host = "localhost" }
@@ -119,7 +115,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Just 3000
                 , pathname = ""
-                , query = ""
+                , query = []
                 , hash = ""
                 }
             )
@@ -133,7 +129,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = ""
-                , query = ""
+                , query = []
                 , hash = ""
                 }
             )
@@ -147,7 +143,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Just 3000
                 , pathname = ""
-                , query = ""
+                , query = []
                 , hash = ""
                 }
             )
@@ -159,7 +155,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Just 3000
                 , pathname = "/a"
-                , query = ""
+                , query = []
                 , hash = ""
                 }
             )
@@ -171,7 +167,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = ""
-                , query = ""
+                , query = []
                 , hash = ""
                 }
             )
@@ -185,7 +181,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = "/a/b/c"
-                , query = ""
+                , query = []
                 , hash = ""
                 }
             )
@@ -197,7 +193,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = "/a/b/c.html"
-                , query = ""
+                , query = []
                 , hash = ""
                 }
             )
@@ -209,7 +205,7 @@ parseTests =
                 , host = ""
                 , port_ = Nothing
                 , pathname = "/foo/bar"
-                , query = ""
+                , query = []
                 , hash = ""
                 }
             )
@@ -221,7 +217,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = "/a/b/"
-                , query = ""
+                , query = []
                 , hash = ""
                 }
             )
@@ -235,7 +231,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = "/a"
-                , query = "?a=1&b=2"
+                , query = [ ( "a", "1" ), ( "b", "2" ) ]
                 , hash = ""
                 }
             )
@@ -249,7 +245,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = "/a"
-                , query = "?a=1"
+                , query = [ ( "a", "1" ) ]
                 , hash = "x=1"
                 }
             )
@@ -261,7 +257,7 @@ parseTests =
                 , host = "hello.com"
                 , port_ = Nothing
                 , pathname = "/a"
-                , query = ""
+                , query = []
                 , hash = "x=1"
                 }
             )
@@ -273,7 +269,7 @@ parseTests =
                 , host = ""
                 , port_ = Nothing
                 , pathname = "/a"
-                , query = ""
+                , query = []
                 , hash = "x=1"
                 }
             )
