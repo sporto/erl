@@ -39,7 +39,7 @@ Erl.toString url
 
 ## Query parsing
 
-There isn't a unique standard for query parsing. Many frameworks / libraries do this in different ways. E.g. an array might be `a[]=1&a[]=2` or `a=1&a=2`.
+There are many ways to parse query strings. E.g. an array might be `a[]=1&a[]=2` or `a=1&a=2` depending on the web framework or library.
 
 Erl parses the query into a `List (String, String)`. This is a bit more useful than just a string, but not as opinionated as other libraries.
 
