@@ -14,34 +14,16 @@ Erl.parse url
 
 -- Returns a Erl.Url record:
 
-{ protocol: "http"
-, username: "sam"
-, password: "pass"
-, host: ["api", "example", "com"]
-, port_: 3000
-, path: ["products", "kids"]
-, hash: "toys/1"
-, hasLeadingSlash: True
-, hasTrailingSlash: False
-, query: 
-    [ ("color", "red")
-    , ("age", "10")
-    ]
+{ protocol = "http"
+, host = "api.example.com"
+, port_ = Just 3000
+, pathname = "/products/kids"
+, query = [ ( "color", "red" ), ( "age", "10") ]
+, hash = "#toys/1"
 }
 ```
 
 See MDN for more details (https://developer.mozilla.org/en-US/docs/Web/API/Location). Note that in MDN `query` is called `search`.
-
-## Construct
-
-### `new`
-
-```elm
--- Construct an empty Erl.Url record:
-
-url = 
-  Erl.new
-```
 
 ## `toString`
 
@@ -55,9 +37,11 @@ Erl.toString url
 "http://www.foo.com:2000/users/1?k=2&q=1#a/b"
 ```
 
-## Mutations
+## Query parsing
 
-See documentation
+There are many ways to parse query strings. E.g. an array might be `a[]=1&a[]=2` or `a=1&a=2` depending on the web framework or library.
+
+Erl parses the query into a `List (String, String)`. This is a bit more useful than just a string, but not as opinionated as other libraries.
 
 ## Documentation
 
@@ -69,10 +53,5 @@ See documentation
 yarn install
 npm test
 ```
-
-## Todo
-
-- Username
-- Password
 
 ## [Changelog](https://github.com/sporto/erl/blob/master/changelog.md)

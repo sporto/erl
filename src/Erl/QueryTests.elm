@@ -5,20 +5,29 @@ import Test exposing (..)
 import Expect
 
 
-testParse =
-    let
-        inputs =
-            [ ( "?a=1&b=2", [ ( "a", "1" ), ( "b", "2" ) ] )
-            , ( "?a%3F=1%26", [ ( "a?", "1&" ) ] )
-            , ( "?a=1&a=2", [ ( "a", "1" ), ( "a", "2" ) ] )
-            ]
+parseTest testCase input expected =
+    test testCase <|
+        \_ ->
+            Expect.equal
+                (Subject.parse input)
+                expected
 
-        run ( input, expected ) =
-            test ("Parses the query " ++ input) <|
-                \() -> Expect.equal expected (Subject.parse input)
-    in
-        describe "Query"
-            (List.map run inputs)
+
+parseTests =
+    describe "parse"
+        [ parseTest
+            "It parses"
+            "?a=1&b=2"
+            (Ok [ ( "a", "1" ), ( "b", "2" ) ])
+        , parseTest
+            "I decodes"
+            "?a%3F=1%26"
+            (Ok [ ( "a?", "1&" ) ])
+        , parseTest
+            "I parses same keys"
+            "?a=1&a=2"
+            (Ok [ ( "a", "1" ), ( "a", "2" ) ])
+        ]
 
 
 testAdd =
@@ -82,7 +91,7 @@ testRemove =
 testGetQueryValuesForKey =
     let
         query =
-            Subject.parse "?a=1&b=2&a=3"
+            [ ( "a", "1" ), ( "b", "2" ), ( "a", "3" ) ]
 
         input =
             [ ( "a", [ "1", "3" ] )
@@ -138,7 +147,7 @@ testToString =
 all : Test
 all =
     describe "Query Tests"
-        [ testParse
+        [ parseTests
         , testAdd
         , testGetQueryValuesForKey
         , testRemove

@@ -1,5 +1,25 @@
 # Changelog
 
+## 14.0.0
+
+This version is a major re-write, it now uses `elm-tools/parser`.
+
+### Changed
+
+- `parse` now returns a `Result`
+- `Url` is now a simpler record. `pathname` and `query` are just strings.
+
+### Removed
+
+- Path as `List String`
+- Path operations
+- Query as `Dict`
+- Query operations
+- Implicit ports based on the protocol
+- Decoding when parsing
+
+This version removes many features that the previous version had, please open issues if you consider any missing feature necessary.
+
 ## 13.0.1
 
 - Do not include port 443 (default) when protocol is https

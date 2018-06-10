@@ -1,6 +1,5 @@
 module Main exposing (..)
 
-import Json.Encode exposing (Value)
 import ErlTests
 import Erl.QueryTests
 import Test exposing (..)
