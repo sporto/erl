@@ -241,7 +241,7 @@ protocolParser =
 hostParser : Parser String
 hostParser =
     oneOf
-        [ keep oneOrMore (\c -> c /= ':' && c /= '/')
+        [ keep oneOrMore (\c -> c /= ':' && c /= '/' && c /= '?')
         , succeed ""
         ]
 

@@ -235,6 +235,30 @@ parseTests =
                 , hash = ""
                 }
             )
+        , parseTest
+            "query without path"
+            "http://hello.com?a=1&b=2"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Nothing
+                , pathname = ""
+                , query = [ ( "a", "1" ), ( "b", "2" ) ]
+                , hash = ""
+                }
+            )
+        , parseTest
+            "query without path with trailing /"
+            "http://hello.com/?a=1&b=2"
+            (Ok
+                { protocol = "http"
+                , host = "hello.com"
+                , port_ = Nothing
+                , pathname = "/"
+                , query = [ ( "a", "1" ), ( "b", "2" ) ]
+                , hash = ""
+                }
+            )
 
         -- Hash
         , parseTest

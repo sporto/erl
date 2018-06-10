@@ -7,14 +7,14 @@ This version is a major re-write, it now uses `elm-tools/parser`.
 ### Changed
 
 - `parse` now returns a `Result`
-- `Url` is now a simpler record. `pathname` and `query` are just strings.
+- `host` is now a string.
+- Renamed `path` to `pathname`
+- `pathname` is now a string.
 
 ### Removed
 
 - Path as `List String`
 - Path operations
-- Query as `Dict`
-- Query operations
 - Implicit ports based on the protocol
 - Decoding when parsing
 
