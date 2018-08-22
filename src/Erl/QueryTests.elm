@@ -1,8 +1,8 @@
-module Erl.QueryTests exposing (..)
+module Erl.QueryTests exposing (all, parseTest, parseTests, testAdd, testGetQueryValuesForKey, testRemove, testSet, testToString)
 
 import Erl.Query as Subject
-import Test exposing (..)
 import Expect
+import Test exposing (..)
 
 
 parseTest testCase input expected =
@@ -51,8 +51,8 @@ testAdd =
             test ("add " ++ name) <|
                 \() -> Expect.equal expected actual
     in
-        describe "Adds to the query"
-            (List.map run inputs)
+    describe "Adds to the query"
+        (List.map run inputs)
 
 
 testSet =
@@ -69,8 +69,8 @@ testSet =
             test "set" <|
                 \() -> Expect.equal expected actual
     in
-        describe "Sets the query"
-            (List.map run inputs)
+    describe "Sets the query"
+        (List.map run inputs)
 
 
 testRemove =
@@ -84,8 +84,8 @@ testRemove =
                 |> Subject.add "b" "2"
                 |> Subject.remove "b"
     in
-        test "Removes the query" <|
-            \() -> Expect.equal expected actual
+    test "Removes the query" <|
+        \() -> Expect.equal expected actual
 
 
 testGetQueryValuesForKey =
@@ -103,10 +103,10 @@ testGetQueryValuesForKey =
                 actual =
                     Subject.getValuesForKey key query
             in
-                test ("getValuesForKey " ++ key) <|
-                    \() -> Expect.equal expected actual
+            test ("getValuesForKey " ++ key) <|
+                \() -> Expect.equal expected actual
     in
-        describe "Gets query values" <| List.map run input
+    describe "Gets query values" <| List.map run input
 
 
 testToString =
@@ -138,10 +138,10 @@ testToString =
                 result =
                     Expect.equal expected actual
             in
-                test testCase <| \() -> result
+            test testCase <| \() -> result
     in
-        describe "toString"
-            (List.map run inputs)
+    describe "toString"
+        (List.map run inputs)
 
 
 all : Test

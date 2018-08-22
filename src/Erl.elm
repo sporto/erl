@@ -1,11 +1,9 @@
-module Erl
-    exposing
-        ( new
-        , parse
-        , toString
-        , toAbsoluteString
-        , Url
-        )
+module Erl exposing
+    ( Url
+    , parse
+    , new
+    , toString, toAbsoluteString
+    )
 
 {-| Library for parsing and constructing URLs
 
@@ -14,13 +12,16 @@ module Erl
 
 @docs Url
 
+
 # Parse
 
 @docs parse
 
+
 # Construct
 
 @docs new
+
 
 # Serialize
 
@@ -34,6 +35,7 @@ import Http
 import Parser exposing (..)
 import Regex
 import String
+
 
 
 -- TYPES
@@ -82,11 +84,12 @@ portToString url =
         Just 443 ->
             if url.protocol == "https" then
                 ""
+
             else
                 ":443"
 
         Just other ->
-            ":" ++ (Basics.toString other)
+            ":" ++ Basics.toString other
 
 
 pathnameToString : Url -> String
@@ -100,20 +103,22 @@ pathnameToString url =
         leadingSlash =
             if String.startsWith "/" url.pathname then
                 ""
+
             else
                 "/"
     in
-        if String.isEmpty url.pathname then
-            ""
-        else
-            leadingSlash ++ encoded
+    if String.isEmpty url.pathname then
+        ""
+
+    else
+        leadingSlash ++ encoded
 
 
 {-| @priv
 Decode one symbol in a string
-    decodeSymbol ">" "hello%3Eworld"
-    ==
-    "hello>world"
+decodeSymbol ">" "hello%3Eworld"
+==
+"hello>world"
 -}
 decodeSymbol : String -> String -> String
 decodeSymbol symbol =
@@ -121,7 +126,7 @@ decodeSymbol symbol =
         encoded =
             Http.encodeUri symbol
     in
-        Regex.replace Regex.All (Regex.regex encoded) (\_ -> symbol)
+    Regex.replace Regex.All (Regex.regex encoded) (\_ -> symbol)
 
 
 {-| Convert to a string the hash component of an url, this includes '#'
@@ -133,8 +138,10 @@ hashToString : Url -> String
 hashToString url =
     if String.isEmpty url.hash then
         ""
+
     else if String.startsWith "#" url.hash then
         url.hash
+
     else
         "#" ++ url.hash
 
@@ -152,23 +159,23 @@ queryToString url =
                 |> List.map (\( k, v ) -> Http.encodeUri k ++ "=" ++ Http.encodeUri v)
                 |> String.join "&"
     in
-        if List.isEmpty url.query then
-            ""
-        else
-            "?" ++ encoded
+    if List.isEmpty url.query then
+        ""
+
+    else
+        "?" ++ encoded
 
 
 {-| Generate an empty Url record
 
-    Erl.new ==
-
-    { protocol = ""
-    , host = ""
-    , port_ = Nothing
-    , pathname = ""
-    , query = []
-    , hash = ""
-    }
+    Erl.new
+        == { protocol = ""
+           , host = ""
+           , port_ = Nothing
+           , pathname = ""
+           , query = []
+           , hash = ""
+           }
 
 -}
 new : Url
@@ -197,10 +204,10 @@ new =
 -}
 toString : Url -> String
 toString url =
-    (protocolToString url)
-        ++ (hostToString url)
-        ++ (portToString url)
-        ++ (toAbsoluteString url)
+    protocolToString url
+        ++ hostToString url
+        ++ portToString url
+        ++ toAbsoluteString url
 
 
 {-| Generate a url that starts at the path
@@ -218,9 +225,9 @@ toString url =
 -}
 toAbsoluteString : Url -> String
 toAbsoluteString url =
-    (pathnameToString url)
-        ++ (queryToString url)
-        ++ (hashToString url)
+    pathnameToString url
+        ++ queryToString url
+        ++ hashToString url
 
 
 
@@ -264,7 +271,7 @@ hashParser =
     oneOf
         [ succeed identity
             |. symbol "#"
-            |= (keep oneOrMore (always True))
+            |= keep oneOrMore (always True)
             |. end
         , succeed ""
         ]

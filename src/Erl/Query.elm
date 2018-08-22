@@ -1,20 +1,18 @@
-module Erl.Query
-    exposing
-        ( parse
-        , parser
-        , toString
-        , add
-        , set
-        , remove
-        , getValuesForKey
-        , Query
-        )
+module Erl.Query exposing
+    ( Query
+    , parse, parser
+    , add, set, remove
+    , toString
+    , getValuesForKey
+    )
 
 {-| Functions to work with a Query record
+
 
 # Types
 
 @docs Query
+
 
 # Parse
 
@@ -38,8 +36,8 @@ module Erl.Query
 -}
 
 import Http
-import String
 import Parser exposing (..)
+import String
 
 
 {-| List holding query string values
@@ -50,7 +48,7 @@ type alias Query =
 
 {-| Parse a query string
 
-    Erl.Query.parse "?a=1&b=2&a=3" == [("a", "1"), ("b", "2"), ("a", "1")]
+    Erl.Query.parse "?a=1&b=2&a=3" == [ ( "a", "1" ), ( "b", "2" ), ( "a", "1" ) ]
 
 -}
 parse : String -> Result Parser.Error Query
@@ -59,7 +57,6 @@ parse input =
 
 
 {-| Query Parser
-
 -}
 parser : Parser Query
 parser =
@@ -73,7 +70,7 @@ parser =
 
 kvParser : Parser ( String, String )
 kvParser =
-    succeed (,)
+    succeed (\a b -> ( a, b ))
         |= map decodeUri keyParser
         |. symbol "="
         |= map decodeUri valueParser
@@ -112,10 +109,11 @@ toString query =
         parts =
             List.map (\( a, b ) -> a ++ "=" ++ b) encodedTuples
     in
-        if List.isEmpty query then
-            ""
-        else
-            "?" ++ (String.join "&" parts)
+    if List.isEmpty query then
+        ""
+
+    else
+        "?" ++ String.join "&" parts
 
 
 {-| Adds key/value in query string
@@ -143,7 +141,7 @@ set key val query =
         without =
             remove key query
     in
-        add key val without
+    add key val without
 
 
 {-| Removes key from query string

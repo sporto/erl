@@ -1,10 +1,11 @@
-module ErlTests exposing (..)
+module ErlTests exposing (all, parseTest, parseTests, roundTripTest, roundTripTests, toStringTest, toStringTests, url)
 
-import String
 import Dict
 import Erl
-import Test exposing (..)
 import Expect
+import String
+import Test exposing (..)
+
 
 
 -- TO STRING
