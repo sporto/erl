@@ -4,6 +4,10 @@
 
 A URL parsing and construction library for ELM
 
+## elm/url/
+
+As of Elm 0.19, Elm core has a package works very similarly to Erl. See <https://package.elm-lang.org/packages/elm/url/latest/Url#fromString>.
+
 ## `parse` a url string
 
 ```elm
