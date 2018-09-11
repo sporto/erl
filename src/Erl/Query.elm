@@ -38,6 +38,7 @@ module Erl.Query exposing
 import Http
 import Parser exposing (..)
 import String
+import Url
 
 
 {-| List holding query string values
@@ -51,9 +52,10 @@ type alias Query =
     Erl.Query.parse "?a=1&b=2&a=3" == [ ( "a", "1" ), ( "b", "2" ), ( "a", "1" ) ]
 
 -}
-parse : String -> Result Parser.Error Query
+parse : String -> Result String Query
 parse input =
     run parser input
+        |> Result.mapError deadEndsToString
 
 
 {-| Query Parser
@@ -62,8 +64,14 @@ parser : Parser Query
 parser =
     oneOf
         [ succeed identity
-            |. symbol "?"
-            |= repeat oneOrMore kvParser
+            |= sequence
+                { start = "?"
+                , separator = "&"
+                , end = ""
+                , spaces = spaces
+                , item = kvParser
+                , trailing = Optional
+                }
         , succeed []
         ]
 
@@ -74,25 +82,21 @@ kvParser =
         |= map decodeUri keyParser
         |. symbol "="
         |= map decodeUri valueParser
-        |. oneOf
-            [ symbol "&"
-            , succeed ()
-            ]
 
 
 keyParser : Parser String
 keyParser =
-    keep oneOrMore (\c -> c /= '=' && c /= '#')
+    getChompedString <| chompWhile (\c -> c /= '=' && c /= '#')
 
 
 valueParser : Parser String
 valueParser =
-    keep oneOrMore (\c -> c /= '&' && c /= '#')
+    getChompedString <| chompWhile (\c -> c /= '&' && c /= '#')
 
 
 decodeUri : String -> String
 decodeUri =
-    Http.decodeUri >> Maybe.withDefault ""
+    Url.percentDecode >> Maybe.withDefault ""
 
 
 {-| Convert to a string, this includes '?'
@@ -104,7 +108,7 @@ toString : Query -> String
 toString query =
     let
         encodedTuples =
-            List.map (\( x, y ) -> ( Http.encodeUri x, Http.encodeUri y )) query
+            List.map (\( x, y ) -> ( Url.percentEncode x, Url.percentEncode y )) query
 
         parts =
             List.map (\( a, b ) -> a ++ "=" ++ b) encodedTuples

@@ -35,6 +35,7 @@ import Http
 import Parser exposing (..)
 import Regex
 import String
+import Url
 
 
 
@@ -53,6 +54,38 @@ type alias Url =
     }
 
 
+{-| Parse an url into a Url record
+
+    Erl.parse "http://hello.com/users/1?k=1&q=2#a/b"
+
+    Ok
+        { protocol = "http",
+        , host = "hello.com",
+        , port_ = Just 2000,
+        , pathname = "/users/1",
+        , query = [ ("k", "1"), ("q", "2") ]
+        , hash = "a/b",
+        }
+
+-}
+parse : String -> Result String Url
+parse input =
+    run parser input
+        |> Result.mapError deadEndsToString
+
+
+parser : Parser Url
+parser =
+    succeed Url
+        |= protocolParser
+        |= hostParser
+        |= portParser
+        |= pathnameParser
+        |= Erl.Query.parser
+        |= hashParser
+        |. end
+
+
 
 -- TO STRING
 
@@ -69,7 +102,7 @@ protocolToString url =
 
 hostToString : Url -> String
 hostToString url =
-    Http.encodeUri url.host
+    Url.percentEncode url.host
 
 
 portToString : Url -> String
@@ -89,7 +122,7 @@ portToString url =
                 ":443"
 
         Just other ->
-            ":" ++ Basics.toString other
+            ":" ++ String.fromInt other
 
 
 pathnameToString : Url -> String
@@ -97,7 +130,7 @@ pathnameToString url =
     let
         encoded =
             url.pathname
-                |> Http.encodeUri
+                |> Url.percentEncode
                 |> decodeSymbol "/"
 
         leadingSlash =
@@ -116,17 +149,25 @@ pathnameToString url =
 
 {-| @priv
 Decode one symbol in a string
-decodeSymbol ">" "hello%3Eworld"
-==
+
+
+# decodeSymbol ">" "hello%3Eworld"
+
 "hello>world"
+
 -}
 decodeSymbol : String -> String -> String
 decodeSymbol symbol =
     let
         encoded =
-            Http.encodeUri symbol
+            Url.percentEncode symbol
+
+        regex : Regex.Regex
+        regex =
+            Regex.fromString encoded
+                |> Maybe.withDefault Regex.never
     in
-    Regex.replace Regex.All (Regex.regex encoded) (\_ -> symbol)
+    Regex.replace regex (\_ -> symbol)
 
 
 {-| Convert to a string the hash component of an url, this includes '#'
@@ -156,7 +197,7 @@ queryToString url =
     let
         encoded =
             url.query
-                |> List.map (\( k, v ) -> Http.encodeUri k ++ "=" ++ Http.encodeUri v)
+                |> List.map (\( k, v ) -> Url.percentEncode k ++ "=" ++ Url.percentEncode v)
                 |> String.join "&"
     in
     if List.isEmpty url.query then
@@ -237,20 +278,30 @@ toAbsoluteString url =
 protocolParser : Parser String
 protocolParser =
     oneOf
-        [ map2
-            (\prot _ -> prot)
-            (keep oneOrMore Char.isLower)
-            (keyword "://")
+        [ protocolPresentParser
         , succeed ""
         ]
+
+
+protocolPresentParser : Parser String
+protocolPresentParser =
+    getChompedString <|
+        succeed identity
+            |= chompIf Char.isLower
+            |. keyword "://"
 
 
 hostParser : Parser String
 hostParser =
     oneOf
-        [ keep oneOrMore (\c -> c /= ':' && c /= '/' && c /= '?')
+        [ hostPresentParser
         , succeed ""
         ]
+
+
+hostPresentParser : Parser String
+hostPresentParser =
+    getChompedString <| chompIf (\c -> c /= ':' && c /= '/' && c /= '?')
 
 
 portParser : Parser (Maybe Int)
@@ -263,46 +314,20 @@ portParser =
 
 pathnameParser : Parser String
 pathnameParser =
-    keep zeroOrMore (\c -> c /= '#' && c /= '?')
+    getChompedString <| chompIf (\c -> c /= '#' && c /= '?')
 
 
 hashParser : Parser String
 hashParser =
     oneOf
-        [ succeed identity
-            |. symbol "#"
-            |= keep oneOrMore (always True)
-            |. end
+        [ hashPresentParser
         , succeed ""
         ]
 
 
-parser : Parser Url
-parser =
-    succeed Url
-        |= protocolParser
-        |= hostParser
-        |= portParser
-        |= pathnameParser
-        |= Erl.Query.parser
-        |= hashParser
+hashPresentParser : Parser String
+hashPresentParser =
+    succeed identity
+        |. symbol "#"
+        |= (getChompedString <| chompIf (always True))
         |. end
-
-
-{-| Parse an url into a Url record
-
-    Erl.parse "http://hello.com/users/1?k=1&q=2#a/b"
-
-    Ok
-        { protocol = "http",
-        , host = "hello.com",
-        , port_ = Just 2000,
-        , pathname = "/users/1",
-        , query = [ ("k", "1"), ("q", "2") ]
-        , hash = "a/b",
-        }
-
--}
-parse : String -> Result Parser.Error Url
-parse input =
-    run parser input
