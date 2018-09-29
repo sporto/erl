@@ -30,6 +30,7 @@ module Erl exposing
 -}
 
 import Char
+import Erl.DeadEnd
 import Erl.Query exposing (Query)
 import Http
 import Parser exposing (..)
@@ -71,7 +72,7 @@ type alias Url =
 parse : String -> Result String Url
 parse input =
     run parser input
-        |> Result.mapError deadEndsToString
+        |> Result.mapError Erl.DeadEnd.deadEndsToString
 
 
 parser : Parser Url
