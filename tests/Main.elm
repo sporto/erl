@@ -1,7 +1,8 @@
-module Main exposing (..)
+module Main exposing (all)
 
-import ErlTests
+import Erl.ParsersTests
 import Erl.QueryTests
+import ErlTests
 import Test exposing (..)
 
 
@@ -10,4 +11,5 @@ all =
     describe "all"
         [ ErlTests.all
         , Erl.QueryTests.all
+        , Erl.ParsersTests.all
         ]

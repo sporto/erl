@@ -1,4 +1,4 @@
-module Erl.QueryTests exposing (all, parseTest, parseTests, testAdd, testGetQueryValuesForKey, testRemove, testSet, testToString)
+module Erl.QueryTests exposing (all)
 
 import Erl.Query as Subject
 import Expect

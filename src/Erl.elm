@@ -31,6 +31,7 @@ module Erl exposing
 
 import Char
 import Erl.DeadEnd
+import Erl.Parsers exposing (..)
 import Erl.Query exposing (Query)
 import Http
 import Parser exposing (..)
@@ -274,22 +275,6 @@ toAbsoluteString url =
 
 
 -- NEW
-
-
-protocolParser : Parser String
-protocolParser =
-    oneOf
-        [ protocolPresentParser
-        , succeed ""
-        ]
-
-
-protocolPresentParser : Parser String
-protocolPresentParser =
-    getChompedString <|
-        succeed identity
-            |= chompIf Char.isLower
-            |. keyword "://"
 
 
 hostParser : Parser String
