@@ -30,15 +30,23 @@ hostParser =
 
 hostPresentParser : Parser String
 hostPresentParser =
-    getChompedString <| chompWhile (\c -> c /= ':' && c /= '/' && c /= '?')
+    getChompedString <|
+        chompWhile (\c -> c /= ':' && c /= '/' && c /= '?')
 
 
 portParser : Parser (Maybe Int)
 portParser =
     oneOf
-        [ Parser.map Just <| succeed identity |. symbol ":" |= int
+        [ Parser.map Just <| portParserPreset
         , succeed Nothing
         ]
+
+
+portParserPreset : Parser Int
+portParserPreset =
+    succeed identity
+        |. symbol ":"
+        |= int
 
 
 pathnameParser : Parser String

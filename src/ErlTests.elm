@@ -101,7 +101,7 @@ roundTripTests =
 
 
 parseTest testCase input expected =
-    test testCase <|
+    test (testCase ++ " - " ++ input) <|
         \_ ->
             Expect.equal (Erl.parse input) expected
 
