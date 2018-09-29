@@ -1,4 +1,4 @@
-module Erl.Parsers exposing (protocolParser)
+module Erl.Parsers exposing (hashParser, hostParser, pathnameParser, portParser, protocolParser)
 
 import Parser exposing (..)
 
@@ -18,3 +18,45 @@ protocolPresentParser =
             |. chompIf Char.isLower
             |. chompWhile Char.isLower
             |. chompUntil "://"
+
+
+hostParser : Parser String
+hostParser =
+    oneOf
+        [ hostPresentParser
+        , succeed ""
+        ]
+
+
+hostPresentParser : Parser String
+hostPresentParser =
+    getChompedString <| chompWhile (\c -> c /= ':' && c /= '/' && c /= '?')
+
+
+portParser : Parser (Maybe Int)
+portParser =
+    oneOf
+        [ Parser.map Just <| succeed identity |. symbol ":" |= int
+        , succeed Nothing
+        ]
+
+
+pathnameParser : Parser String
+pathnameParser =
+    getChompedString <| chompWhile (\c -> c /= '#' && c /= '?')
+
+
+hashParser : Parser String
+hashParser =
+    oneOf
+        [ hashPresentParser
+        , succeed ""
+        ]
+
+
+hashPresentParser : Parser String
+hashPresentParser =
+    succeed identity
+        |. symbol "#"
+        |= (getChompedString <| chompWhile (always True))
+        |. end
